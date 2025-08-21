@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "travel-planner-agent"
+version = "0.1.0"
+description = "A simple travel planning system with 3 agents using LangGraph and ChatGroq"
+authors = ["Your Name <your.email@example.com>"]
+readme = "README.md"
+packages = [{include = "src"}]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+langchain = "^0.2.0"
+langgraph = "^0.2.0"
+langchain-groq = "^0.1.0"
+python-dotenv = "^1.0.0"
+streamlit = "^1.48.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+travel-planner = "main:main"
