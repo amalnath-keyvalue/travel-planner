@@ -1,77 +1,72 @@
-"""Streamlit demo for the travel planner."""
+"""Streamlit app to view actual agent interactions."""
 
 import streamlit as st
+from langchain_core.messages import HumanMessage
 
 from src import TravelSupervisorGraph
 
 
+def show_agent_trace(messages):
+    """Show the actual agent conversation trace."""
+    st.markdown("### 🔍 Agent Trace")
+
+    for i, msg in enumerate(messages):
+        if hasattr(msg, "name") and msg.name:
+            # Agent message
+            agent_name = msg.name.replace("_", " ").title()
+            with st.expander(f"🤖 {agent_name}", expanded=(i < 3)):
+                st.write(msg.content)
+        elif hasattr(msg, "tool_calls") and msg.tool_calls:
+            # Tool calls
+            with st.expander(f"🔧 Tool Calls", expanded=True):
+                for tool_call in msg.tool_calls:
+                    st.code(f"Tool: {tool_call['name']}")
+
+
 def main():
-    """Streamlit demo."""
-    st.set_page_config(page_title="Travel Planner Demo", page_icon="✈️", layout="wide")
+    """Main app."""
+    st.set_page_config(page_title="Agent Viewer", page_icon="🔍", layout="wide")
 
-    st.title("✈️ Multi-Agent Travel Planner")
-    st.markdown("**LangGraph Supervisor Pattern Demo for Senior Engineers**")
+    st.title("🔍 Multi-Agent Interaction Viewer")
+    st.caption("See actual LangGraph agent conversations")
 
-    # Initialize system
-    if "travel_system" not in st.session_state:
-        with st.spinner("Initializing multi-agent system..."):
-            st.session_state.travel_system = TravelSupervisorGraph()
-        st.success("✅ Multi-agent system initialized!")
+    # Initialize
+    if "system" not in st.session_state:
+        st.session_state.system = TravelSupervisorGraph()
 
-    # Show system info
-    with st.expander("🔧 System Architecture", expanded=False):
-        for agent, desc in st.session_state.travel_system.get_agent_info().items():
-            st.write(f"**{agent.title()}**: {desc}")
+    # Input
+    query = st.text_input("Query:", placeholder="Plan a 3-day trip to Tokyo")
 
-    # Demo buttons
-    st.markdown("### 🎯 Quick Demo Queries")
+    if query:
+        col1, col2 = st.columns([1, 1])
 
-    col1, col2, col3 = st.columns(3)
+        with col1:
+            st.markdown("### 💬 User Query")
+            st.write(query)
 
-    with col1:
-        if st.button("🏖️ Find Beach Destinations", use_container_width=True):
-            query = "Find me beautiful beach destinations for vacation"
-            st.session_state.demo_query = query
-
-    with col2:
-        if st.button("📅 Plan Japan Trip", use_container_width=True):
-            query = "Plan a 5-day itinerary for Tokyo with cultural activities"
-            st.session_state.demo_query = query
-
-    with col3:
-        if st.button("💰 Calculate Budget", use_container_width=True):
-            query = "Calculate budget for a week in Bali for 2 people"
-            st.session_state.demo_query = query
-
-    # Process demo query
-    if "demo_query" in st.session_state:
-        st.markdown("### 🤖 Agent Response")
-
-        with st.spinner(f"Processing: {st.session_state.demo_query}"):
-            try:
-                response = st.session_state.travel_system.chat(
-                    st.session_state.demo_query
+            st.markdown("### 🤖 Final Response")
+            with st.spinner("Processing..."):
+                # Get the full graph execution
+                result = st.session_state.system.graph.invoke(
+                    {"messages": [HumanMessage(content=query)]}
                 )
-                st.success("✅ Response received!")
-                st.markdown(response)
-            except Exception as e:
-                st.error(f"❌ Error: {e}")
 
-        # Clear the query
-        del st.session_state.demo_query
+                # Extract final response
+                final_response = "No response generated"
+                for msg in reversed(result["messages"]):
+                    if hasattr(msg, "name") and msg.name in [
+                        "search_agent",
+                        "planning_agent",
+                        "booking_agent",
+                    ]:
+                        final_response = msg.content
+                        break
 
-    # Custom input
-    st.markdown("### 💬 Custom Query")
-    user_input = st.text_input("Ask anything about travel planning:")
+                st.write(final_response)
 
-    if user_input:
-        with st.spinner("Processing your request..."):
-            try:
-                response = st.session_state.travel_system.chat(user_input)
-                st.markdown("**Response:**")
-                st.markdown(response)
-            except Exception as e:
-                st.error(f"Error: {e}")
+        with col2:
+            # Show the actual agent interactions
+            show_agent_trace(result["messages"])
 
 
 if __name__ == "__main__":

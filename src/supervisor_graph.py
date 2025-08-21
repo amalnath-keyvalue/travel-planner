@@ -65,20 +65,19 @@ class TravelSupervisorGraph:
                 transfer_to_booking_agent,
             ],
             prompt=(
-                "You are a travel planning supervisor managing three specialized agents:\n\n"
-                "🔍 SEARCH AGENT: Handles destination search and weather information\n"
-                "📋 PLANNING AGENT: Creates itineraries and calculates budgets\n"
-                "🏨 BOOKING AGENT: Searches accommodations and flights\n\n"
-                "ROUTING RULES:\n"
-                "- For finding destinations, exploring places, weather queries → transfer_to_search_agent\n"
-                "- For creating itineraries, planning trips, calculating budgets → transfer_to_planning_agent\n"
-                "- For finding hotels, flights, booking assistance → transfer_to_booking_agent\n\n"
-                "INSTRUCTIONS:\n"
-                "- Analyze the user's request carefully\n"
-                "- Route to the most appropriate agent based on the primary task\n"
-                "- Use only ONE agent per request - do not call multiple agents\n"
-                "- Provide a brief explanation of why you're routing to that agent\n"
-                "- DO NOT attempt to answer travel questions yourself - always route to specialists"
+                "You are a travel planning supervisor. Your ONLY job is to route requests to specialist agents.\n\n"
+                "Available agents:\n"
+                "🔍 SEARCH AGENT: Finding destinations, weather information, location details\n"
+                "📋 PLANNING AGENT: Creating itineraries, calculating budgets, trip planning\n"
+                "🏨 BOOKING AGENT: Searching accommodations, flights, making reservations\n\n"
+                "CRITICAL INSTRUCTIONS:\n"
+                "- You MUST ALWAYS call exactly ONE transfer tool\n"
+                "- NEVER attempt to answer questions yourself\n"
+                "- Analyze the user's request and immediately route to the appropriate agent\n"
+                "- For destination/weather queries → call transfer_to_search_agent\n"
+                "- For itinerary/budget planning → call transfer_to_planning_agent\n"
+                "- For booking/accommodation queries → call transfer_to_booking_agent\n\n"
+                "Your response should ONLY be the tool call - no additional text."
             ),
             name="supervisor",
         )
@@ -101,26 +100,12 @@ class TravelSupervisorGraph:
             elif tool_name == "transfer_to_booking_agent":
                 return "booking_agent"
 
-        # Default routing based on message content if no tool was called
-        content = str(state["messages"][-1].content).lower()
-
-        if any(
-            word in content
-            for word in ["find", "search", "destination", "weather", "where", "explore"]
-        ):
-            return "search_agent"
-        elif any(
-            word in content
-            for word in ["plan", "itinerary", "budget", "cost", "schedule", "days"]
-        ):
-            return "planning_agent"
-        elif any(
-            word in content
-            for word in ["book", "hotel", "flight", "accommodation", "stay", "room"]
-        ):
-            return "booking_agent"
-        else:
-            return "search_agent"  # Default to search
+        # If no tool was called, there's an issue with the supervisor
+        # The supervisor MUST always call a routing tool
+        print(
+            f"⚠️ Warning: Supervisor did not call any routing tool. Last message: {last_message}"
+        )
+        return "search_agent"  # Emergency fallback only
 
     def _build_graph(self) -> StateGraph:
         """Build the supervisor graph following LangGraph patterns."""
