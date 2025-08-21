@@ -1,7 +1,7 @@
 from langchain_core.messages import HumanMessage
 from langchain_core.tools import tool
 
-from src.config import Config
+from ...config import Config
 from .constants import ACCOMMODATION_PROMPT, BOOKING_PROMPT
 from .schemas import AccommodationResult, BookingResult
 
@@ -14,7 +14,9 @@ def find_accommodation(
     llm = Config.get_llm()
     llm_with_structured_output = llm.with_structured_output(AccommodationResult)
 
-    prompt = ACCOMMODATION_PROMPT.format(destination=destination, budget=budget, accommodation_type=accommodation_type)
+    prompt = ACCOMMODATION_PROMPT.format(
+        destination=destination, budget=budget, accommodation_type=accommodation_type
+    )
     result = llm_with_structured_output.invoke([HumanMessage(content=prompt)])
     return result
 
@@ -27,6 +29,8 @@ def confirm_booking(
     llm = Config.get_llm()
     llm_with_structured_output = llm.with_structured_output(BookingResult)
 
-    prompt = BOOKING_PROMPT.format(destination=destination, accommodation=accommodation, dates=dates, price=price)
+    prompt = BOOKING_PROMPT.format(
+        destination=destination, accommodation=accommodation, dates=dates, price=price
+    )
     result = llm_with_structured_output.invoke([HumanMessage(content=prompt)])
     return result

@@ -1,9 +1,7 @@
-from langchain.agents import AgentExecutor, create_openai_tools_agent
-from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langchain.agents import AgentExecutor, create_react_agent
 
-from src.config import Config
-
-from .constants import PLAN_AGENT_SYSTEM
+from ...config import Config
+from ...constants import REACT_PROMPT
 from .tools import calculate_budget, create_itinerary
 
 
@@ -12,15 +10,7 @@ class PlanAgent:
         self.llm = Config.get_llm()
         self.tools = [create_itinerary, calculate_budget]
 
-        prompt = ChatPromptTemplate.from_messages(
-            [
-                ("system", PLAN_AGENT_SYSTEM),
-                ("human", "{input}"),
-                MessagesPlaceholder(variable_name="agent_scratchpad"),
-            ]
-        )
-
-        self.agent = create_openai_tools_agent(self.llm, self.tools, prompt)
+        self.agent = create_react_agent(self.llm, self.tools, REACT_PROMPT)
         self.agent_executor = AgentExecutor(
             agent=self.agent, tools=self.tools, verbose=False
         )

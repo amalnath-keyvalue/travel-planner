@@ -1,8 +1,7 @@
 from langchain_core.messages import HumanMessage
 from langchain_core.tools import tool
 
-from src.config import Config
-
+from ...config import Config
 from .constants import SEARCH_DESTINATIONS_PROMPT, WEATHER_PROMPT
 from .schemas import SearchResult, WeatherResult
 

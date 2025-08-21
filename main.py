@@ -1,4 +1,4 @@
-from src.supervisor import LangGraphTravelPlanner
+from src import LangGraphTravelPlanner
 
 
 def main():

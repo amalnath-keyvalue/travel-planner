@@ -1,5 +1,9 @@
-PLAN_AGENT_SYSTEM = """You are a travel planning specialist. Help users create itineraries and calculate budgets. Use your tools to provide detailed planning assistance."""
+from langchain import hub
 
-ITINERARY_PROMPT = """Create a {days}-day itinerary for {destination} with interests: {interests}. Include daily activities, highlights, and food recommendations."""
+PLAN_AGENT_SYSTEM = """You are a travel planning specialist. Help users create itineraries and calculate budgets for their trips."""
 
-BUDGET_PROMPT = """Calculate budget for {days} days in {destination} with {accommodation_type} accommodation. Provide total budget, breakdown, daily average, and money saving tips."""
+ITINERARY_PROMPT = """Create a {days}-day travel itinerary for {destination} based on interests: {interests}. Include daily activities, recommendations, and estimated costs."""
+
+BUDGET_PROMPT = """Calculate estimated budget for a {days}-day trip to {destination} with {accommodation_type} accommodation. Include breakdown of costs."""
+
+REACT_PROMPT = hub.pull("hwchase17/react")

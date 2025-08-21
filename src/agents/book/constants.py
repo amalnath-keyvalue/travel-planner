@@ -1,5 +1,9 @@
-BOOK_AGENT_SYSTEM = """You are a travel booking specialist. Help users find accommodation and confirm bookings. Use your tools to provide booking assistance."""
+from langchain import hub
 
-ACCOMMODATION_PROMPT = """Find accommodation options in {destination} for a budget of ${budget} with {accommodation_type} preference. Provide options with prices, locations, and recommendations."""
+BOOK_AGENT_SYSTEM = """You are a travel booking specialist. Help users find accommodation and confirm bookings."""
 
-BOOKING_PROMPT = """Create a booking confirmation for {destination}, {accommodation}, dates {dates}, price ${price}. Include confirmation details, code, next steps, and contact info."""
+ACCOMMODATION_PROMPT = """Find accommodation options in {destination} within budget ${budget} for {accommodation_type} type. Provide 3-4 options with prices and features."""
+
+BOOKING_PROMPT = """Confirm booking for {accommodation} in {destination} for dates {dates} at price ${price}. Provide booking confirmation details."""
+
+REACT_PROMPT = hub.pull("hwchase17/react")
