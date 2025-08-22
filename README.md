@@ -1,6 +1,13 @@
-# Travel Planner Agent
+# Multi-Agent Travel Planner
 
-A simple travel planning system with 3 agents using LangGraph and ChatGroq, featuring both a command-line interface and a modern Streamlit web app.
+A simple travel planning system using LangGraph and Groq.
+
+## Features
+
+### 🤖 Multi-Agent Architecture
+- **Supervisor Agent**: Routes requests and handles general planning
+- **Search Agent**: Handles weather and location information
+- **Booking Agent**: Manages hotel and flight bookings with approval flow
 
 ## Setup
 
@@ -13,64 +20,40 @@ poetry install
 
 # Set up environment variables
 cp .env.example .env
-# Edit .env with your API keys
+# Add your GROQ_API_KEY to .env
 ```
 
 ## Usage
 
-### 🌐 Streamlit Web App (Recommended)
+### 🌐 Streamlit Web App
 
 ```bash
 # Run the Streamlit app
-poetry run streamlit run streamlit_app.py
-
-# Or use the helper script
-python run_streamlit.py
+poetry run streamlit run streamlit_demo.py
 ```
 
-The Streamlit app will open in your browser at `http://localhost:8501` and provides:
-- Interactive chat interface with travel agents
-- Quick action buttons for common queries
-- Real-time responses from your AI agents
-- Chat history and conversation management
-- Beautiful, modern UI
+The app will open at `http://localhost:8501` with:
+- Interactive chat interface
+- Example suggestions
+- Real-time agent responses
+- Natural booking approvals
 
-### 💻 Command Line Interface
+### 💻 Terminal Demo
 
 ```bash
-# Run the demo
-poetry run python main.py
-
-# Or use the Poetry script
-poetry run travel-planner
+# Run the demo script
+poetry run python demo.py
 ```
 
-## Architecture
+## Technical Details
 
-- **Search Agent**: Finds destinations and checks weather
-- **Plan Agent**: Creates itineraries and calculates budgets  
-- **Book Agent**: Finds accommodation and confirms bookings
-- **LangGraph**: Orchestrates workflow between agents
-- **ChatGroq**: Provides LLM capabilities for each agent
+### 🏗️ Architecture
+- **Supervisor Pattern**: Central router with specialist agents
+- **Tool-Based Delegation**: LLM-driven routing decisions
+- **Pydantic Models**: Structured data validation
+- **LangGraph Features**: Checkpointing, interrupts, state management
 
-## Environment Variables
-
-```bash
-GROQ_API_KEY=your_groq_api_key
-```
-
-## Features
-
-### ✨ Streamlit App Features
-- **Interactive Chat**: Natural language queries to travel agents
-- **Quick Actions**: Pre-built buttons for common travel questions
-- **Real-time Processing**: Live responses from your AI agents
-- **Chat History**: Persistent conversation tracking
-- **Responsive Design**: Works on desktop and mobile devices
-- **API Key Management**: Secure input for your Groq API key
-
-### 🔧 Technical Features
-- **Multi-Agent System**: Coordinated workflow between specialized agents
-- **LangGraph Integration**: Robust conversation flow management
-- **Error Handling**: Graceful error handling and user feedback
-- **Session Management**: Persistent state across app interactions
+### 🔧 Agent Capabilities
+- **Supervisor**: General planning, request routing, direct responses
+- **Search**: Weather info, location details, travel data
+- **Booking**: Hotel search, flight search, booking confirmations
