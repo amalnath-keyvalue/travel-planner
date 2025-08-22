@@ -3,9 +3,9 @@
 import os
 
 from dotenv import load_dotenv
-from langchain_groq import ChatGroq
 from langgraph.prebuilt import create_react_agent
 
+from .config import get_llm_model
 from .tools import (
     calculate_trip_budget,
     create_detailed_itinerary,
@@ -20,12 +20,9 @@ load_dotenv()
 
 def create_search_agent():
     """Create the search agent for destinations and weather."""
-    return create_react_agent(
-        model=ChatGroq(
-            groq_api_key=os.getenv("GROQ_API_KEY"),
-            model_name="llama3-70b-8192",
-            temperature=0.1,
-        ),
+    print("🔵 Creating search agent...")
+    agent = create_react_agent(
+        model=get_llm_model(),
         tools=[search_destinations, get_weather_forecast],
         prompt=(
             "You are a travel search agent specializing in destinations and weather.\n\n"
@@ -39,16 +36,15 @@ def create_search_agent():
         ),
         name="search_agent",
     )
+    print("🔵 Search agent created")
+    return agent
 
 
 def create_planning_agent():
     """Create the planning agent for itineraries and budgets."""
-    return create_react_agent(
-        model=ChatGroq(
-            groq_api_key=os.getenv("GROQ_API_KEY"),
-            model_name="llama3-70b-8192",
-            temperature=0.1,
-        ),
+    print("🔵 Creating planning agent...")
+    agent = create_react_agent(
+        model=get_llm_model(),
         tools=[create_detailed_itinerary, calculate_trip_budget],
         prompt=(
             "You are a travel planning agent specializing in itineraries and budgets.\n\n"
@@ -63,16 +59,15 @@ def create_planning_agent():
         ),
         name="planning_agent",
     )
+    print("🔵 Planning agent created")
+    return agent
 
 
 def create_booking_agent():
     """Create the booking agent for accommodations and flights."""
-    return create_react_agent(
-        model=ChatGroq(
-            groq_api_key=os.getenv("GROQ_API_KEY"),
-            model_name="llama3-70b-8192",
-            temperature=0.1,
-        ),
+    print("🔵 Creating booking agent...")
+    agent = create_react_agent(
+        model=get_llm_model(),
         tools=[search_accommodations, search_flights],
         prompt=(
             "You are a travel booking agent specializing in accommodations and flights.\n\n"
@@ -87,3 +82,5 @@ def create_booking_agent():
         ),
         name="booking_agent",
     )
+    print("🔵 Booking agent created")
+    return agent

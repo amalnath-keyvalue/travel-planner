@@ -34,11 +34,6 @@ def main():
         except Exception as e:
             print(f"❌ Error: {e}")
 
-    print(f"\n🎉 Demo completed! All agents working correctly.")
-    print(f"\n📊 Available Agents:")
-    for agent, description in travel_system.get_agent_info().items():
-        print(f"  • {agent}: {description}")
-
     # Interactive mode
     print(f"\n💬 Interactive Mode (type 'quit' to exit)")
     print("-" * 40)

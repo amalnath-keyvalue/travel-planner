@@ -1,7 +1,6 @@
 """Tools for the travel planning agents following LangChain patterns."""
 
 import json
-from typing import Any, Dict
 
 from langchain_core.tools import tool
 
