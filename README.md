@@ -29,7 +29,7 @@ cp .env.example .env
 
 ```bash
 # Run the Streamlit app
-poetry run streamlit run streamlit_demo.py
+poetry run streamlit run streamlit_app.py
 ```
 
 The app will open at `http://localhost:8501` with:
@@ -37,13 +37,6 @@ The app will open at `http://localhost:8501` with:
 - Example suggestions
 - Real-time agent responses
 - Natural booking approvals
-
-### 💻 Terminal Demo
-
-```bash
-# Run the demo script
-poetry run python demo.py
-```
 
 ## Technical Details
 
