@@ -1,7 +1,6 @@
 """Streamlit demo with chat-based approval."""
 
 import time
-from datetime import datetime
 
 import streamlit as st
 
@@ -38,16 +37,7 @@ def main():
     st.title("🤖 Multi-Agent Travel Planner")
     st.markdown("**Chat-based multi-agent system with natural approval workflow**")
 
-    # Chat Interface
-    st.subheader("💬 Chat Interface")
-
-    # Display chat messages
-    for message in st.session_state.messages:
-        with st.chat_message(message["role"]):
-            st.write(message["content"])
-
-    # Examples below chat
-    st.divider()
+    # Examples at top (fixed position)
     st.caption("💡 Try these examples:")
     example_cols = st.columns(2)
     examples = [
@@ -69,7 +59,12 @@ def main():
                 use_container_width=True,
             )
 
-    # Chat input at the bottom
+    # Chat messages
+    for message in st.session_state.messages:
+        with st.chat_message(message["role"]):
+            st.write(message["content"])
+
+    # Chat input
     if prompt := st.chat_input("Ask about travel planning...", key="chat_input"):
         # Add user message and display
         st.session_state.messages.append({"role": "user", "content": prompt})
@@ -79,11 +74,9 @@ def main():
         # Process with agents
         with st.chat_message("assistant"):
             with st.spinner("Processing..."):
-                start_time = time.time()
                 response = st.session_state.graph.chat(
                     prompt, conversation_id=st.session_state.conversation_id
                 )
-                end_time = time.time()
 
                 # Check if interrupted
                 if isinstance(response, dict) and response.get("interrupted"):
@@ -98,11 +91,12 @@ def main():
             {"role": "assistant", "content": response_text}
         )
 
-    # Clear button at the bottom
-    if st.button("🗑️ Clear Chat", use_container_width=True):
-        st.session_state.messages = []
-        st.session_state.conversation_id = f"streamlit_{int(time.time())}"
-        st.rerun()
+    # Clear button
+    if st.session_state.messages:
+        if st.button("🗑️ Clear Chat", use_container_width=True):
+            st.session_state.messages = []
+            st.session_state.conversation_id = f"streamlit_{int(time.time())}"
+            st.rerun()
 
 
 if __name__ == "__main__":
