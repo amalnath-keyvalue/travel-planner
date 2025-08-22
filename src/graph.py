@@ -13,37 +13,6 @@ from .agents import create_booking_agent, create_search_agent, create_supervisor
 load_dotenv()
 
 
-def route_supervisor_output(state: MessagesState):
-    """Route based on supervisor's tool usage."""
-    messages = state.get("messages", [])
-    if not messages:
-        return END
-
-    last_message = messages[-1]
-
-    # If last message is from supervisor without tool calls, end conversation
-    if getattr(last_message, "name", None) == "supervisor" and not (
-        hasattr(last_message, "tool_calls") and last_message.tool_calls
-    ):
-        return END
-
-    # Look for delegation tool calls from supervisor
-    for message in reversed(messages):
-        if (
-            hasattr(message, "tool_calls")
-            and message.tool_calls
-            and getattr(message, "name", None) == "supervisor"
-        ):
-            for tool_call in message.tool_calls:
-                if tool_call["name"] == "delegate_to_search_agent":
-                    return "search_agent"
-                elif tool_call["name"] == "delegate_to_booking_agent":
-                    return "booking_agent"
-
-    # Default to END
-    return END
-
-
 class TravelPlannerGraph:
     """Multi-agent travel planner using supervisor pattern."""
 
@@ -55,26 +24,24 @@ class TravelPlannerGraph:
         self.enable_memory = enable_memory
         self.graph = self._build_graph()
 
-    def _build_graph(self) -> StateGraph:
-        """Build the supervisor graph."""
+    def _build_graph(self):
+        """Build the supervisor graph using the proper LangGraph supervisor pattern."""
+        # Following the official LangGraph supervisor tutorial pattern
+
+        # Create the supervisor graph
         workflow = StateGraph(MessagesState)
 
-        # Add nodes
-        workflow.add_node("supervisor", self.supervisor_agent)
+        # Add the supervisor agent with destinations
+        workflow.add_node(
+            self.supervisor_agent, destinations=("search_agent", "booking_agent")
+        )
+
+        # Add worker agents
         workflow.add_node("search_agent", self.search_agent)
         workflow.add_node("booking_agent", self.booking_agent)
 
         # Define flow
         workflow.add_edge(START, "supervisor")
-        workflow.add_conditional_edges(
-            "supervisor",
-            route_supervisor_output,
-            {
-                "search_agent": "search_agent",
-                "booking_agent": "booking_agent",
-                END: END,
-            },
-        )
         workflow.add_edge("search_agent", "supervisor")
         workflow.add_edge("booking_agent", "supervisor")
 
