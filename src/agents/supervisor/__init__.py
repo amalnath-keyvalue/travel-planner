@@ -1,11 +1,10 @@
 """Supervisor agent module."""
 
-from .agent import route_to_agent, supervisor_node
-from .tools import make_supervisor_decision, should_continue
+from .agent import create_supervisor_agent
+from .tools import delegate_to_booking_agent, delegate_to_search_agent
 
 __all__ = [
-    "supervisor_node",
-    "route_to_agent",
-    "make_supervisor_decision",
-    "should_continue",
+    "create_supervisor_agent",
+    "delegate_to_search_agent",
+    "delegate_to_booking_agent",
 ]

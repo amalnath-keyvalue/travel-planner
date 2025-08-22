@@ -1,24 +1,51 @@
-"""Clean multi-agent supervisor graph with LangGraph interrupts."""
+"""Multi-agent travel planner graph."""
 
 from dotenv import load_dotenv
 from langchain_core.messages import HumanMessage, SystemMessage
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import END, START, MessagesState, StateGraph
 
-from .agents import (
-    create_booking_agent,
-    create_search_agent,
-    route_to_agent,
-    supervisor_node,
-)
+from .agents import create_booking_agent, create_search_agent, create_supervisor_agent
 
 load_dotenv()
+
+
+def route_supervisor_output(state: MessagesState):
+    """Route based on supervisor's tool usage."""
+    messages = state.get("messages", [])
+    if not messages:
+        return END
+
+    last_message = messages[-1]
+
+    # If last message is from supervisor without tool calls, end conversation
+    if getattr(last_message, "name", None) == "supervisor" and not (
+        hasattr(last_message, "tool_calls") and last_message.tool_calls
+    ):
+        return END
+
+    # Look for delegation tool calls from supervisor
+    for message in reversed(messages):
+        if (
+            hasattr(message, "tool_calls")
+            and message.tool_calls
+            and getattr(message, "name", None) == "supervisor"
+        ):
+            for tool_call in message.tool_calls:
+                if tool_call["name"] == "delegate_to_search_agent":
+                    return "search_agent"
+                elif tool_call["name"] == "delegate_to_booking_agent":
+                    return "booking_agent"
+
+    # Default to END
+    return END
 
 
 class TravelPlannerGraph:
     """Multi-agent travel planner using supervisor pattern."""
 
     def __init__(self, enable_human_loop: bool = True, enable_memory: bool = True):
+        self.supervisor_agent = create_supervisor_agent()
         self.search_agent = create_search_agent()
         self.booking_agent = create_booking_agent()
         self.enable_human_loop = enable_human_loop
@@ -26,11 +53,11 @@ class TravelPlannerGraph:
         self.graph = self._build_graph()
 
     def _build_graph(self) -> StateGraph:
-        """Build the supervisor graph with interrupts."""
+        """Build the supervisor graph."""
         workflow = StateGraph(MessagesState)
 
         # Add nodes
-        workflow.add_node("supervisor", supervisor_node)
+        workflow.add_node("supervisor", self.supervisor_agent)
         workflow.add_node("search_agent", self.search_agent)
         workflow.add_node("booking_agent", self.booking_agent)
 
@@ -38,7 +65,7 @@ class TravelPlannerGraph:
         workflow.add_edge(START, "supervisor")
         workflow.add_conditional_edges(
             "supervisor",
-            route_to_agent,
+            route_supervisor_output,
             {
                 "search_agent": "search_agent",
                 "booking_agent": "booking_agent",
@@ -48,96 +75,40 @@ class TravelPlannerGraph:
         workflow.add_edge("search_agent", "supervisor")
         workflow.add_edge("booking_agent", "supervisor")
 
-        # Compile with interrupts before booking agent
-        interrupt_before = ["booking_agent"] if self.enable_human_loop else []
-
         if self.enable_memory:
-            return workflow.compile(
-                checkpointer=MemorySaver(), interrupt_before=interrupt_before
-            )
-        return workflow.compile(interrupt_before=interrupt_before)
+            return workflow.compile(checkpointer=MemorySaver())
+        return workflow.compile()
 
     def chat(self, message: str, conversation_id: str = "demo") -> str | dict:
-        """Chat interface with LangGraph interrupts."""
+        """Chat interface that handles both new messages and resumption."""
         config = (
-            {"configurable": {"thread_id": conversation_id}}
+            {"configurable": {"thread_id": conversation_id}, "recursion_limit": 10}
             if self.enable_memory
-            else {}
+            else {"recursion_limit": 10}
         )
 
-        # Initial invoke
-        result = self.graph.invoke(
-            {"messages": [HumanMessage(content=message)]}, config=config
-        )
-
-        # Check if we were interrupted by examining the state (only if memory enabled)
+        # Check if we should resume from an interrupted state
         if self.enable_memory:
             state = self.graph.get_state(config)
-            if state.next and "booking_agent" in state.next:
-                # We were interrupted before booking agent - return interrupt info
+            if state.next:  # We have a pending workflow, resume it
+                result = self.graph.invoke(None, config=config)
+                return result["messages"][-1].content
+
+        # Start new conversation
+        result = self.graph.invoke(
+            {"messages": [HumanMessage(content=message)]},
+            config=config,
+        )
+
+        # Check if execution was interrupted
+        if self.enable_memory:
+            state = self.graph.get_state(config)
+            if state.next:  # If there are pending nodes, we were interrupted
                 return {
                     "interrupted": True,
-                    "message": "🔄 About to delegate to booking agent - requires human approval",
                     "user_request": message,
                     "conversation_id": conversation_id,
-                    "next_step": state.next[0] if state.next else None,
                 }
 
-        # Extract final response if not interrupted
-        for msg in reversed(result["messages"]):
-            if hasattr(msg, "name") and msg.name in [
-                "search_agent",
-                "booking_agent",
-                "supervisor",
-            ]:
-                return msg.content
-            elif hasattr(msg, "content") and isinstance(msg, SystemMessage):
-                return msg.content
-
-        return "I'm ready to help you plan your travel!"
-
-    def approve_and_continue(self, conversation_id: str = "demo") -> str:
-        """Approve the interrupted workflow and let LangGraph continue automatically."""
-        config = (
-            {"configurable": {"thread_id": conversation_id}}
-            if self.enable_memory
-            else {}
-        )
-
-        # Simply invoke with None - LangGraph will resume from where it was interrupted
-        result = self.graph.invoke(None, config=config)
-
-        # Extract final response
-        for msg in reversed(result["messages"]):
-            if hasattr(msg, "name") and msg.name in [
-                "search_agent",
-                "booking_agent",
-                "supervisor",
-            ]:
-                return msg.content
-            elif hasattr(msg, "content") and isinstance(msg, SystemMessage):
-                return msg.content
-
-        return "Request processed."
-
-    def reject_and_stop(self, conversation_id: str = "demo") -> str:
-        """Reject the booking request and stop the workflow."""
-        config = (
-            {"configurable": {"thread_id": conversation_id}}
-            if self.enable_memory
-            else {}
-        )
-
-        # Add rejection message to state and end the workflow
-        self.graph.update_state(
-            config,
-            {
-                "messages": [
-                    SystemMessage(
-                        content="Booking request rejected by human supervisor."
-                    )
-                ]
-            },
-        )
-
-        return "Booking request rejected by human supervisor."
+        # Return the last message from agents directly
+        return result["messages"][-1].content

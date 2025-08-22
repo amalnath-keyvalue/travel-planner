@@ -3,6 +3,7 @@
 import random
 
 from langchain_core.tools import tool
+from langgraph.types import interrupt
 
 from .schemas import (
     Accommodation,
@@ -15,14 +16,12 @@ from .schemas import (
 
 @tool
 def search_accommodations(
-    destination: str, check_in: str, check_out: str, guests: str = "2"
+    destination: str,
+    check_in: str,
+    check_out: str,
+    guests: int,
 ) -> AccommodationSearch:
     """Search for accommodation options in a destination."""
-
-    try:
-        num_guests = int(guests)
-    except:
-        num_guests = 2
 
     # Simple demo accommodations
     accommodations = [
@@ -50,7 +49,7 @@ def search_accommodations(
         destination=destination,
         check_in=check_in,
         check_out=check_out,
-        guests=num_guests,
+        guests=guests,
         options=accommodations,
         booking_tips=["Book early for better rates"],
     )
@@ -58,7 +57,10 @@ def search_accommodations(
 
 @tool
 def search_flights(
-    origin: str, destination: str, departure_date: str, return_date: str = None
+    origin: str,
+    destination: str,
+    departure_date: str,
+    return_date: str | None = None,
 ) -> FlightSearch:
     """Search for flight options between origin and destination."""
 
@@ -93,4 +95,85 @@ def search_flights(
         is_roundtrip=is_roundtrip,
         options=flights,
         booking_tips=["Book early for better prices"],
+    )
+
+
+@tool
+def confirm_accommodation_booking(
+    accommodation_name: str,
+    destination: str,
+    check_in: str,
+    check_out: str,
+    guest_name: str,
+    payment_method: str,
+) -> BookingResponse:
+    """CONFIRM and complete accommodation booking - requires human approval.
+
+    Only use this tool when you have ALL required information:
+    - accommodation_name: Name of the hotel/accommodation
+    - destination: City or location
+    - check_in: Check-in date
+    - check_out: Check-out date
+    - guest_name: Full name of the guest
+    - payment_method: How guest wants to pay
+
+    If any information is missing, ask the user for it first."""
+
+    # Interrupt for human approval before confirming
+    interrupt(
+        {
+            "type": "accommodation_booking",
+            "accommodation_name": accommodation_name,
+            "destination": destination,
+            "check_in": check_in,
+            "check_out": check_out,
+            "guest_name": guest_name,
+            "payment_method": payment_method,
+        }
+    )
+
+    return BookingResponse(
+        status="confirmed",
+        booking_reference=f"HTL{random.randint(100000, 999999)}",
+        details=f"Booking confirmed for {accommodation_name} in {destination}",
+        confirmation_message=f"Your accommodation booking is confirmed! Reference: HTL{random.randint(100000, 999999)}",
+    )
+
+
+@tool
+def confirm_flight_booking(
+    airline: str,
+    route: str,
+    departure_date: str,
+    passenger_name: str,
+    payment_method: str,
+) -> BookingResponse:
+    """CONFIRM and complete flight booking - requires human approval.
+
+    Only use this tool when you have ALL required information:
+    - airline: Name of the airline
+    - route: From where to where (e.g., "NYC to LAX")
+    - departure_date: When the flight departs
+    - passenger_name: Full name of the passenger
+    - payment_method: How passenger wants to pay
+
+    If any information is missing, ask the user for it first."""
+
+    # Interrupt for human approval before confirming
+    interrupt(
+        {
+            "type": "flight_booking",
+            "airline": airline,
+            "route": route,
+            "departure_date": departure_date,
+            "passenger_name": passenger_name,
+            "payment_method": payment_method,
+        }
+    )
+
+    return BookingResponse(
+        status="confirmed",
+        booking_reference=f"FLT{random.randint(100000, 999999)}",
+        details=f"Flight booking confirmed with {airline} for {route}",
+        confirmation_message=f"Your flight booking is confirmed! Reference: FLT{random.randint(100000, 999999)}",
     )
