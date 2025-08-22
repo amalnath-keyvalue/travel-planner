@@ -1,5 +1,5 @@
-"""Professional Travel Planner using LangGraph Multi-Agent Supervisor Architecture."""
+"""Travel planner package."""
 
-from .supervisor_graph import TravelSupervisorGraph
+from .graph import TravelPlannerGraph
 
-__all__ = ["TravelSupervisorGraph"]
+__all__ = ["TravelPlannerGraph"]

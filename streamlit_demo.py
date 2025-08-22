@@ -1,72 +1,209 @@
-"""Streamlit app to view actual agent interactions."""
+"""Streamlit demo with multi-agent communication."""
+
+import time
+from datetime import datetime
 
 import streamlit as st
-from langchain_core.messages import HumanMessage
 
-from src import TravelSupervisorGraph
+from src import TravelPlannerGraph
 
 
-def show_agent_trace(messages):
-    """Show the actual agent conversation trace."""
-    st.markdown("### 🔍 Agent Trace")
+def initialize_session_state():
+    """Initialize Streamlit session state."""
+    if "graph" not in st.session_state:
+        st.session_state.graph = TravelPlannerGraph(
+            enable_human_loop=True, enable_memory=True
+        )
+    if "conversation_id" not in st.session_state:
+        st.session_state.conversation_id = f"streamlit_{int(time.time())}"
+    if "messages" not in st.session_state:
+        st.session_state.messages = []
+    if "logs" not in st.session_state:
+        st.session_state.logs = []
+    if "pending_approval" not in st.session_state:
+        st.session_state.pending_approval = None
 
-    for i, msg in enumerate(messages):
-        if hasattr(msg, "name") and msg.name:
-            # Agent message
-            agent_name = msg.name.replace("_", " ").title()
-            with st.expander(f"🤖 {agent_name}", expanded=(i < 3)):
-                st.write(msg.content)
-        elif hasattr(msg, "tool_calls") and msg.tool_calls:
-            # Tool calls
-            with st.expander(f"🔧 Tool Calls", expanded=True):
-                for tool_call in msg.tool_calls:
-                    st.code(f"Tool: {tool_call['name']}")
+
+def add_log(step: str, details: str = ""):
+    """Add log entry with timestamp."""
+    timestamp = datetime.now().strftime("%H:%M:%S")
+    st.session_state.logs.append(f"[{timestamp}] {step}")
+    if details:
+        st.session_state.logs.append(f"           {details}")
 
 
 def main():
-    """Main app."""
-    st.set_page_config(page_title="Agent Viewer", page_icon="🔍", layout="wide")
+    """Main Streamlit app."""
+    st.set_page_config(
+        page_title="Multi-Agent Travel Planner",
+        page_icon="🤖",
+        layout="wide",
+    )
 
-    st.title("🔍 Multi-Agent Interaction Viewer")
-    st.caption("See actual LangGraph agent conversations")
+    initialize_session_state()
 
-    # Initialize
-    if "system" not in st.session_state:
-        st.session_state.system = TravelSupervisorGraph()
+    st.title("🤖 Multi-Agent Travel Planner")
+    st.markdown(
+        "**Supervisor-based multi-agent system with human approval for bookings**"
+    )
 
-    # Input
-    query = st.text_input("Query:", placeholder="Plan a 3-day trip to Tokyo")
+    # Create columns
+    col1, col2 = st.columns([2, 1])
 
-    if query:
-        col1, col2 = st.columns([1, 1])
+    with col1:
+        st.subheader("💬 Chat Interface")
 
-        with col1:
-            st.markdown("### 💬 User Query")
-            st.write(query)
+        # Handle pending approval
+        if st.session_state.pending_approval:
+            st.warning("⏸️ Workflow paused - approval required")
 
-            st.markdown("### 🤖 Final Response")
-            with st.spinner("Processing..."):
-                # Get the full graph execution
-                result = st.session_state.system.graph.invoke(
-                    {"messages": [HumanMessage(content=query)]}
+            interrupt_info = st.session_state.pending_approval
+            st.info(f"**Next:** {interrupt_info.get('next_step', 'booking_agent')}")
+            st.write(f"**Request:** {interrupt_info.get('user_request', 'Unknown')}")
+
+            col_approve, col_reject = st.columns(2)
+            with col_approve:
+                if st.button("✅ Approve", use_container_width=True):
+                    add_log("👤 Human", "Approved")
+
+                    with st.spinner("Continuing..."):
+                        response = st.session_state.graph.approve_and_continue(
+                            conversation_id=st.session_state.conversation_id
+                        )
+
+                    add_log("▶️ Resumed", "Workflow continued")
+                    st.session_state.messages.append(
+                        {"role": "assistant", "content": response}
+                    )
+                    st.session_state.pending_approval = None
+                    st.rerun()
+
+            with col_reject:
+                if st.button("❌ Reject", use_container_width=True):
+                    add_log("👤 Human", "Rejected")
+
+                    response = st.session_state.graph.reject_and_stop(
+                        conversation_id=st.session_state.conversation_id
+                    )
+
+                    add_log("❌ Stopped", "Workflow ended")
+                    st.session_state.messages.append(
+                        {"role": "assistant", "content": response}
+                    )
+                    st.session_state.pending_approval = None
+                    st.rerun()
+
+        # Display chat messages
+        for message in st.session_state.messages:
+            with st.chat_message(message["role"]):
+                st.write(message["content"])
+
+        # Chat input
+        if not st.session_state.pending_approval:
+            if prompt := st.chat_input("Ask about travel planning..."):
+                # Add user message
+                st.session_state.messages.append({"role": "user", "content": prompt})
+                with st.chat_message("user"):
+                    st.write(prompt)
+
+                # Clear logs
+                st.session_state.logs = []
+
+                # Process with agents
+                with st.chat_message("assistant"):
+                    with st.spinner("Processing..."):
+                        add_log("📨 Input", f"'{prompt}'")
+                        add_log("🧠 Supervisor", "Analyzing")
+
+                        start_time = time.time()
+                        response = st.session_state.graph.chat(
+                            prompt, conversation_id=st.session_state.conversation_id
+                        )
+                        end_time = time.time()
+
+                        # Check if interrupted
+                        if isinstance(response, dict) and response.get("interrupted"):
+                            add_log("⏸️ Interrupt", "Paused for approval")
+                            st.session_state.pending_approval = response
+                            st.rerun()
+                        else:
+                            add_log("✅ Complete", f"({end_time - start_time:.1f}s)")
+
+                    st.write(response)
+
+                # Add assistant message
+                if not isinstance(response, dict):
+                    st.session_state.messages.append(
+                        {"role": "assistant", "content": response}
+                    )
+
+    with col2:
+        st.subheader("📊 Communication Logs")
+
+        # Display logs
+        if st.session_state.logs:
+            for log_entry in st.session_state.logs:
+                if log_entry.startswith("["):
+                    st.code(log_entry, language=None)
+                else:
+                    st.text(log_entry)
+        else:
+            st.info("Start a conversation to see logs")
+
+        # Examples
+        st.subheader("💡 Examples")
+
+        examples = [
+            "Plan a 3-day trip to Rome",
+            "What's the weather in London?",
+            "Book a hotel in Tokyo",
+            "Reserve a flight to Paris",
+        ]
+
+        for example in examples:
+            if st.button(example, key=f"btn_{example}", use_container_width=True):
+                # Add user message
+                st.session_state.messages.append({"role": "user", "content": example})
+
+                # Clear logs
+                st.session_state.logs = []
+
+                # Process with agents
+                add_log("📨 Input", f"'{example}'")
+                add_log("🧠 Supervisor", "Analyzing")
+
+                start_time = time.time()
+                response = st.session_state.graph.chat(
+                    example, conversation_id=st.session_state.conversation_id
                 )
+                end_time = time.time()
 
-                # Extract final response
-                final_response = "No response generated"
-                for msg in reversed(result["messages"]):
-                    if hasattr(msg, "name") and msg.name in [
-                        "search_agent",
-                        "planning_agent",
-                        "booking_agent",
-                    ]:
-                        final_response = msg.content
-                        break
+                # Check if interrupted
+                if isinstance(response, dict) and response.get("interrupted"):
+                    add_log("⏸️ Interrupt", "Paused for approval")
+                    st.session_state.pending_approval = response
+                else:
+                    add_log("✅ Complete", f"({end_time - start_time:.1f}s)")
+                    # Add assistant message
+                    st.session_state.messages.append(
+                        {"role": "assistant", "content": response}
+                    )
 
-                st.write(final_response)
+                st.rerun()
 
-        with col2:
-            # Show the actual agent interactions
-            show_agent_trace(result["messages"])
+        # Info
+        st.subheader("ℹ️ System Info")
+        st.text("• Planning: Supervisor handles directly")
+        st.text("• Search: Delegates to search agent")
+        st.text("• Booking: Requires human approval")
+
+        # Clear
+        if st.button("🗑️ Clear", use_container_width=True):
+            st.session_state.messages = []
+            st.session_state.logs = []
+            st.session_state.pending_approval = None
+            st.session_state.conversation_id = f"streamlit_{int(time.time())}"
+            st.rerun()
 
 
 if __name__ == "__main__":
