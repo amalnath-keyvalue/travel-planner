@@ -61,18 +61,18 @@ def demonstrate_agent_communication():
             approval_result = graph.chat("approve", conversation_id=f"demo_{i}")
 
             log_step("▶️ Resumed", "Workflow continued")
-            print(f"\n🎯 Final Response:")
+            print("\n🎯 Final Response:")
             print(f"{approval_result}")
         else:
             log_step("✅ Complete", f"({end_time - start_time:.1f}s)")
-            print(f"\n🎯 Response:")
+            print("\n🎯 Response:")
             print(f"{result}")
 
         print()
         time.sleep(1)
 
     # Test booking confirmation with chat-based approval
-    print(f"\n📋 Testing booking confirmation with chat approval")
+    print("\n📋 Testing booking confirmation with chat approval")
     print("-" * 50)
     log_step("📨 User Input", "'Confirm booking for Hotel Paris, check-in Dec 15'")
     result = graph.chat(
