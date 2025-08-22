@@ -2,14 +2,15 @@
 
 from typing import List, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 
 class Accommodation(BaseModel):
-    """Accommodation option."""
+    """Accommodation details."""
+
     name: str
     type: str
-    price_per_night: int
+    price_per_night: float
     rating: float
     amenities: List[str]
     pros: str
@@ -18,6 +19,7 @@ class Accommodation(BaseModel):
 
 class AccommodationSearch(BaseModel):
     """Accommodation search results."""
+
     destination: str
     check_in: str
     check_out: str
@@ -27,9 +29,10 @@ class AccommodationSearch(BaseModel):
 
 
 class Flight(BaseModel):
-    """Flight option."""
+    """Flight details."""
+
     airline: str
-    price: int
+    price: float
     rating: float
     departure_time: str
     duration: str
@@ -39,6 +42,7 @@ class Flight(BaseModel):
 
 class FlightSearch(BaseModel):
     """Flight search results."""
+
     route: str
     departure_date: str
     return_date: Optional[str]
@@ -48,7 +52,9 @@ class FlightSearch(BaseModel):
 
 
 class BookingResponse(BaseModel):
-    """Booking agent response."""
-    accommodations: Optional[AccommodationSearch] = None
-    flights: Optional[FlightSearch] = None
-    summary: str = Field(description="Booking options summary and recommendations")
+    """Booking confirmation response."""
+
+    status: str
+    booking_reference: str
+    details: str
+    confirmation_message: str

@@ -21,9 +21,7 @@ def search_accommodations(
     check_out: str,
     guests: int,
 ) -> AccommodationSearch:
-    """Search for accommodation options in a destination."""
-
-    # Simple demo accommodations
+    """Search for available accommodations in a destination."""
     accommodations = [
         Accommodation(
             name="Beach Resort",
@@ -62,11 +60,8 @@ def search_flights(
     departure_date: str,
     return_date: str | None = None,
 ) -> FlightSearch:
-    """Search for flight options between origin and destination."""
-
-    # Simple demo flights
+    """Search for available flights between destinations."""
     is_roundtrip = return_date is not None
-
     flights = [
         Flight(
             airline="Demo Airways",
@@ -107,20 +102,9 @@ def confirm_accommodation_booking(
     guest_name: str,
     payment_method: str,
 ) -> BookingResponse:
-    """CONFIRM and complete accommodation booking - requires human approval.
-
-    Only use this tool when you have ALL required information:
-    - accommodation_name: Name of the hotel/accommodation
-    - destination: City or location
-    - check_in: Check-in date
-    - check_out: Check-out date
-    - guest_name: Full name of the guest
-    - payment_method: How guest wants to pay
-
-    If any information is missing, ask the user for it first."""
-
-    # Interrupt for human approval before confirming
-    interrupt(
+    """Complete a hotel booking."""
+    # Show booking details and get approval via button
+    approved: bool = interrupt(
         {
             "type": "accommodation_booking",
             "accommodation_name": accommodation_name,
@@ -132,12 +116,22 @@ def confirm_accommodation_booking(
         }
     )
 
-    return BookingResponse(
-        status="confirmed",
-        booking_reference=f"HTL{random.randint(100000, 999999)}",
-        details=f"Booking confirmed for {accommodation_name} in {destination}",
-        confirmation_message=f"Your accommodation booking is confirmed! Reference: HTL{random.randint(100000, 999999)}",
-    )
+    # If we get here, we have a resume value (True/False from button)
+    if approved:
+        booking_ref = f"HTL{random.randint(100000, 999999)}"
+        return BookingResponse(
+            status="confirmed",
+            booking_reference=booking_ref,
+            details=f"Booking confirmed for {accommodation_name} in {destination}",
+            confirmation_message=f"Your accommodation booking is confirmed! Reference: {booking_ref}",
+        )
+    else:
+        return BookingResponse(
+            status="cancelled",
+            booking_reference="",
+            details="Booking was not approved",
+            confirmation_message="The booking was not approved and has been cancelled.",
+        )
 
 
 @tool
@@ -148,19 +142,9 @@ def confirm_flight_booking(
     passenger_name: str,
     payment_method: str,
 ) -> BookingResponse:
-    """CONFIRM and complete flight booking - requires human approval.
-
-    Only use this tool when you have ALL required information:
-    - airline: Name of the airline
-    - route: From where to where (e.g., "NYC to LAX")
-    - departure_date: When the flight departs
-    - passenger_name: Full name of the passenger
-    - payment_method: How passenger wants to pay
-
-    If any information is missing, ask the user for it first."""
-
-    # Interrupt for human approval before confirming
-    interrupt(
+    """Complete a flight booking."""
+    # Show booking details and get approval via button
+    approved: bool = interrupt(
         {
             "type": "flight_booking",
             "airline": airline,
@@ -171,9 +155,19 @@ def confirm_flight_booking(
         }
     )
 
-    return BookingResponse(
-        status="confirmed",
-        booking_reference=f"FLT{random.randint(100000, 999999)}",
-        details=f"Flight booking confirmed with {airline} for {route}",
-        confirmation_message=f"Your flight booking is confirmed! Reference: FLT{random.randint(100000, 999999)}",
-    )
+    # If we get here, we have a resume value (True/False from button)
+    if approved:
+        booking_ref = f"FLT{random.randint(100000, 999999)}"
+        return BookingResponse(
+            status="confirmed",
+            booking_reference=booking_ref,
+            details=f"Flight booking confirmed with {airline} for {route}",
+            confirmation_message=f"Your flight booking is confirmed! Reference: {booking_ref}",
+        )
+    else:
+        return BookingResponse(
+            status="cancelled",
+            booking_reference="",
+            details="Booking was not approved",
+            confirmation_message="The booking was not approved and has been cancelled.",
+        )
