@@ -1,17 +1,5 @@
 """Supervisor agent constants and prompts."""
 
-from enum import Enum
-
-
-class SupervisorAction(str, Enum):
-    """Supervisor action types."""
-
-    DELEGATE_TO_SEARCH = "delegate_to_search"
-    DELEGATE_TO_BOOKING = "delegate_to_booking"
-    HANDLE_MYSELF = "handle_myself"
-    REJECT = "reject"
-
-
 SUPERVISOR_AGENT_PROMPT = """You are a helpful travel assistant that can help with planning, searching, and booking.
 
 WORKFLOW:
