@@ -37,8 +37,16 @@ def main():
     st.title("🤖 Multi-Agent Travel Planner")
     st.markdown("**Chat-based multi-agent system using Supervisor pattern**")
 
-    st.caption("💡 Try these examples:")
-    example_cols = st.columns(2)
+    # Display the graph structure
+    st.sidebar.header("🔗 Graph Structure")
+    try:
+        mermaid_png = st.session_state.graph.graph.get_graph().draw_mermaid_png()
+        st.sidebar.image(mermaid_png, caption="LangGraph Structure")
+    except Exception as e:
+        st.sidebar.error(f"Could not display graph: {e}")
+
+    # Examples in sidebar
+    st.sidebar.header("💡 Try these examples:")
     examples = [
         "Plan a 3-day trip to Rome",
         "What's the weather in London?",
@@ -47,15 +55,14 @@ def main():
         "Book Hotel Tokyo for Dec 15-17",
     ]
 
-    for i, example in enumerate(examples):
-        with example_cols[i % 2]:
-            st.button(
-                example,
-                key=f"btn_{example}",
-                on_click=handle_example_click,
-                args=(example,),
-                use_container_width=True,
-            )
+    for example in examples:
+        st.sidebar.button(
+            example,
+            key=f"btn_{example}",
+            on_click=handle_example_click,
+            args=(example,),
+            use_container_width=True,
+        )
 
     for message in st.session_state.messages:
         with st.chat_message(message["role"]):
