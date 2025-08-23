@@ -23,6 +23,11 @@ class TravelPlannerGraph:
 
     def _build_graph(self):
         """Build the supervisor graph using langgraph-supervisor."""
+
+        def _debug_hook(event: str):
+            print("\n🔍 SUPERVISOR DEBUG:")
+            print(f"   Event: {event}")
+
         supervisor = create_supervisor(
             model=get_llm_model(),
             agents=[
@@ -32,6 +37,7 @@ class TravelPlannerGraph:
             prompt=SUPERVISOR_PROMPT,
             add_handoff_back_messages=True,
             output_mode="full_history",
+            post_model_hook=_debug_hook,
         )
 
         if self.enable_memory:

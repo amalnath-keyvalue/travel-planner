@@ -52,7 +52,7 @@ def main():
         "What's the weather in London?",
         "Find hotels in Tokyo for 2 nights",
         "Search flights to Paris",
-        "Book Hotel Tokyo for Dec 15-17",
+        "Book a hotel in Tokyo for Dec 15-17",
     ]
 
     for example in examples:
