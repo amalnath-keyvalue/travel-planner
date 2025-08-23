@@ -8,11 +8,12 @@ packages = [{include = "src"}]
 
 [tool.poetry.dependencies]
 python = "^3.12"
-langchain = "^0.2.0"
-langgraph = "^0.2.0"
-langchain-groq = "^0.1.0"
 python-dotenv = "^1.0.0"
 streamlit = "^1.48.1"
+langchain-core = "^0.3.74"
+langchain-groq = "^0.3.7"
+langgraph = "^0.6.6"
+langgraph-supervisor = "^0.0.29"
 
 [build-system]
 requires = ["poetry-core"]

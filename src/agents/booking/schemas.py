@@ -25,7 +25,6 @@ class AccommodationSearch(BaseModel):
     check_out: str
     guests: int
     options: List[Accommodation]
-    booking_tips: List[str]
 
 
 class Flight(BaseModel):

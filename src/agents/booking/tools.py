@@ -3,7 +3,6 @@
 import random
 
 from langchain_core.tools import tool
-from langgraph.types import interrupt
 
 from .schemas import (
     Accommodation,
@@ -49,7 +48,6 @@ def search_accommodations(
         check_out=check_out,
         guests=guests,
         options=accommodations,
-        booking_tips=["Book early for better rates"],
     )
 
 
@@ -103,35 +101,13 @@ def confirm_accommodation_booking(
     payment_method: str,
 ) -> BookingResponse:
     """Complete a hotel booking."""
-    # Show booking details and get approval via button
-    approved: bool = interrupt(
-        {
-            "type": "accommodation_booking",
-            "accommodation_name": accommodation_name,
-            "destination": destination,
-            "check_in": check_in,
-            "check_out": check_out,
-            "guest_name": guest_name,
-            "payment_method": payment_method,
-        }
+    booking_ref = f"HTL{random.randint(100000, 999999)}"
+    return BookingResponse(
+        status="confirmed",
+        booking_reference=booking_ref,
+        details=f"Booking confirmed for {accommodation_name} in {destination}",
+        confirmation_message=f"Your accommodation booking is confirmed! Reference: {booking_ref}",
     )
-
-    # If we get here, we have a resume value (True/False from button)
-    if approved:
-        booking_ref = f"HTL{random.randint(100000, 999999)}"
-        return BookingResponse(
-            status="confirmed",
-            booking_reference=booking_ref,
-            details=f"Booking confirmed for {accommodation_name} in {destination}",
-            confirmation_message=f"Your accommodation booking is confirmed! Reference: {booking_ref}",
-        )
-    else:
-        return BookingResponse(
-            status="cancelled",
-            booking_reference="",
-            details="Booking was not approved",
-            confirmation_message="The booking was not approved and has been cancelled.",
-        )
 
 
 @tool
@@ -143,31 +119,10 @@ def confirm_flight_booking(
     payment_method: str,
 ) -> BookingResponse:
     """Complete a flight booking."""
-    # Show booking details and get approval via button
-    approved: bool = interrupt(
-        {
-            "type": "flight_booking",
-            "airline": airline,
-            "route": route,
-            "departure_date": departure_date,
-            "passenger_name": passenger_name,
-            "payment_method": payment_method,
-        }
+    booking_ref = f"FLT{random.randint(100000, 999999)}"
+    return BookingResponse(
+        status="confirmed",
+        booking_reference=booking_ref,
+        details=f"Flight booking confirmed with {airline} for {route}",
+        confirmation_message=f"Your flight booking is confirmed! Reference: {booking_ref}",
     )
-
-    # If we get here, we have a resume value (True/False from button)
-    if approved:
-        booking_ref = f"FLT{random.randint(100000, 999999)}"
-        return BookingResponse(
-            status="confirmed",
-            booking_reference=booking_ref,
-            details=f"Flight booking confirmed with {airline} for {route}",
-            confirmation_message=f"Your flight booking is confirmed! Reference: {booking_ref}",
-        )
-    else:
-        return BookingResponse(
-            status="cancelled",
-            booking_reference="",
-            details="Booking was not approved",
-            confirmation_message="The booking was not approved and has been cancelled.",
-        )

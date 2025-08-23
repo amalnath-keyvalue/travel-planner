@@ -4,7 +4,7 @@ from langgraph.prebuilt import create_react_agent
 
 from ...config import get_llm_model
 from .constants import SEARCH_AGENT_PROMPT
-from .tools import get_weather_forecast, get_location_info
+from .tools import get_location_info, get_weather_forecast
 
 
 def create_search_agent():
