@@ -3,6 +3,7 @@
 from langgraph.prebuilt import create_react_agent
 
 from ...config import get_llm_model
+from ...utils import debug_hook
 from .constants import SEARCH_AGENT_PROMPT
 from .tools import get_location_info, get_weather_forecast
 
@@ -14,4 +15,6 @@ def create_search_agent():
         tools=[get_weather_forecast, get_location_info],
         prompt=SEARCH_AGENT_PROMPT,
         name="search_agent",
+        pre_model_hook=lambda event: debug_hook(event, "SEARCH_PRE"),
+        post_model_hook=lambda event: debug_hook(event, "SEARCH_POST"),
     )
