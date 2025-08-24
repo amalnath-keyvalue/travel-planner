@@ -2,7 +2,7 @@
 
 from typing import Any
 
-from langchain_core.messages import HumanMessage
+from langchain_core.messages import AIMessage, HumanMessage
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph_supervisor import create_supervisor
 
@@ -35,7 +35,7 @@ class TravelPlannerGraph:
                 create_booking_agent(),
             ],
             prompt=SUPERVISOR_PROMPT,
-            add_handoff_back_messages=True,
+            add_handoff_back_messages=False,
             output_mode="full_history",
             post_model_hook=_debug_hook,
         )
@@ -49,10 +49,15 @@ class TravelPlannerGraph:
         return {"configurable": {"thread_id": conversation_id}}
 
     def chat(self, message: str, conversation_id: str = "demo") -> str | dict:
-        """Chat interface that handles both new messages and resumption."""
+        """Chat interface that returns responses from both supervisor and agents."""
         config = self.get_config(conversation_id)
         result = self.graph.invoke(
             {"messages": [HumanMessage(content=message)]},
             config=config,
         )
-        return result["messages"][-1].content
+
+        messages = result["messages"]
+        ai_responses = [
+            msg for msg in messages if isinstance(msg, AIMessage) and msg.content
+        ]
+        return "\n\n".join([msg.content for msg in ai_responses])
