@@ -21,6 +21,9 @@ def search_accommodations(
     guests: int,
 ) -> AccommodationSearch:
     """Search for available accommodations in a destination."""
+    print(
+        f"search_accommodations: destination={destination}, check_in={check_in}, check_out={check_out}, guests={guests}"
+    )
     accommodations = [
         Accommodation(
             name="Beach Resort",
@@ -60,6 +63,10 @@ def search_flights(
 ) -> FlightSearch:
     """Search for available flights between destinations."""
     is_roundtrip = return_date is not None
+    print(
+        f"search_flights: origin={origin}, destination={destination}, departure_date={departure_date}, "
+        f"return_date={return_date}"
+    )
     flights = [
         Flight(
             airline="Demo Airways",
@@ -101,6 +108,10 @@ def confirm_accommodation_booking(
     payment_method: str,
 ) -> BookingResponse:
     """Complete a hotel booking."""
+    print(
+        f"confirm_accommodation_booking: accommodation_name={accommodation_name}, destination={destination}, check_in={check_in}, "
+        f"check_out={check_out}, guest_name={guest_name}, payment_method={payment_method}"
+    )
     booking_ref = f"HTL{random.randint(100000, 999999)}"
     return BookingResponse(
         status="confirmed",
@@ -119,6 +130,10 @@ def confirm_flight_booking(
     payment_method: str,
 ) -> BookingResponse:
     """Complete a flight booking."""
+    print(
+        f"confirm_flight_booking: airline={airline}, route={route}, departure_date={departure_date}, "
+        f"passenger_name={passenger_name}, payment_method={payment_method}"
+    )
     booking_ref = f"FLT{random.randint(100000, 999999)}"
     return BookingResponse(
         status="confirmed",
