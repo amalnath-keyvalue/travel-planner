@@ -66,11 +66,7 @@ class TravelPlannerGraph:
         ai_responses = []
         for i in range(last_human_index + 1, len(messages)):
             message = messages[i]
-            if (
-                isinstance(message, AIMessage)
-                and message.content
-                and message.content.strip()
-            ):
+            if isinstance(message, AIMessage) and message.content:
                 ai_responses.append(message.content)
 
         if not ai_responses:
