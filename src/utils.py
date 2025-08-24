@@ -18,7 +18,7 @@ def debug_hook(
     for i, msg in enumerate(messages):
         msg_name = getattr(msg, "name", None)
 
-        content = msg.content or "(no content)"
+        content = msg.content.split("\n")[0] or "(no content)"
         content_preview = content[:100]
         if len(content) > 100:
             content_preview += "..."
