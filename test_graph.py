@@ -1,16 +1,20 @@
-from dotenv import load_dotenv
-
 from src.graph import TravelPlannerGraph
-
-load_dotenv()
 
 
 def test_graph():
-    graph = TravelPlannerGraph(enable_memory=False)
-    query = "What's the weather in Rome and what are the top attractions to visit?"
-    response = graph.chat(query)
-    print("RESPONSE:")
-    print(response)
+    """Test the travel planner graph with one query."""
+    graph = TravelPlannerGraph(enable_memory=True)
+
+    query = "What's the weather in London?"
+    print(f"Query: {query}")
+    print("-" * 50)
+
+    try:
+        response = graph.chat(query)
+        print("RESPONSE:")
+        print(response)
+    except Exception as e:
+        print(f"ERROR: {e}")
 
 
 if __name__ == "__main__":

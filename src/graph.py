@@ -57,7 +57,23 @@ class TravelPlannerGraph:
         )
 
         messages = result["messages"]
-        ai_responses = [
-            msg for msg in messages if isinstance(msg, AIMessage) and msg.content
-        ]
-        return "\n\n".join([msg.content for msg in ai_responses])
+
+        last_human_index = -1
+        for i, msg in enumerate(messages):
+            if isinstance(msg, HumanMessage):
+                last_human_index = i
+
+        ai_responses = []
+        for i in range(last_human_index + 1, len(messages)):
+            message = messages[i]
+            if (
+                isinstance(message, AIMessage)
+                and message.content
+                and message.content.strip()
+            ):
+                ai_responses.append(message.content)
+
+        if not ai_responses:
+            return "No response generated. Please try again."
+
+        return "".join(ai_responses)
