@@ -1,5 +1,7 @@
 from src.graph import TravelPlannerGraph
 
+studio_graph = TravelPlannerGraph(enable_memory=False).graph
+
 
 def test_graph():
     """Test the travel planner graph with one query."""
