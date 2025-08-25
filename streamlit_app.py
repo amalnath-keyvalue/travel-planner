@@ -31,13 +31,13 @@ def handle_example_click(text: str):
     st.session_state[f"chat_input_{st.session_state.active_tab}"] = text
 
 
-def display_memories(session_id: str):
-    memories = get_session_memories(session_id)
+def display_memories():
+    memories = get_session_memories("demo")
 
     if not any(memories.values()):
         return
 
-    with st.expander("🧠 Session Memories", expanded=False):
+    with st.expander("🧠 Memories", expanded=False):
         if memories["booking"]:
             st.write("🏨 **Bookings:**")
             for memory in memories["booking"]:
@@ -87,6 +87,7 @@ def render_chat_interface(session_id: str, tab_data: dict):
                         tab_data["messages"].append(
                             {"role": "assistant", "content": response}
                         )
+                        st.rerun()
 
                 except Exception as e:
                     response_text = f"❌ Error: {str(e)}"
@@ -133,13 +134,13 @@ def main():
         for i, (tab_id, tab_data) in enumerate(st.session_state.chat_tabs.items()):
             with selected_tab[i]:
                 st.subheader(f"💬 {tab_data['title']}")
-                display_memories(tab_data["id"])
+                display_memories()
                 render_chat_interface(tab_id, tab_data)
     else:
         st.subheader(
             f"💬 {st.session_state.chat_tabs[st.session_state.active_tab]['title']}"
         )
-        display_memories(st.session_state.active_tab)
+        display_memories()
         render_chat_interface(
             st.session_state.active_tab,
             st.session_state.chat_tabs[st.session_state.active_tab],

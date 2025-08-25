@@ -10,7 +10,6 @@ from langgraph.store.memory import InMemoryStore
 class MemoryEntry:
     content: str
     memory_type: str
-    timestamp: float
     metadata: Dict[str, Any]
 
 
@@ -43,27 +42,27 @@ class TravelMemoryStore:
                 (session_id, "memories"), query=f"type:{memory_type}", limit=100
             )
 
-            result = []
+            results = []
             for item in search_results:
                 if item.value.get("type") == memory_type:
-                    result.append(
+                    results.append(
                         MemoryEntry(
                             content=item.value.get("text", ""),
                             memory_type=memory_type,
-                            timestamp=time.time(),
                             metadata=item.value.get("metadata", {}),
                         )
                     )
-            return result
+            return results
+
         except Exception as e:
             print(f"Error getting memories: {e}")
             return []
 
     def get_all_memories(self, session_id: str) -> Dict[str, List[MemoryEntry]]:
-        result = {}
+        results = {}
         for mem_type in ["booking", "long_term"]:
-            result[mem_type] = self.get_memories(session_id, mem_type)
-        return result
+            results[mem_type] = self.get_memories(session_id, mem_type)
+        return results
 
     def search_memories(
         self, session_id: str, query: str, limit: int = 5
@@ -73,18 +72,17 @@ class TravelMemoryStore:
                 (session_id, "memories"), query=query, limit=limit
             )
 
-            result = []
+            results = []
             for item in search_results:
-                result.append(
+                results.append(
                     MemoryEntry(
                         content=item.value.get("text", ""),
                         memory_type=item.value.get("type", "unknown"),
-                        timestamp=time.time(),
                         metadata=item.value.get("metadata", {}),
                     )
                 )
 
-            return result
+            return results
         except Exception as e:
             print(f"Error searching memories: {e}")
             return []
