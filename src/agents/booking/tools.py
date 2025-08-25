@@ -17,10 +17,17 @@ from .schemas import (
 def search_accommodations(
     destination: str,
     check_in: str,
-    check_out: str,
     guests: int,
+    check_out: str | None = None,
 ) -> AccommodationSearch:
     """Search for available accommodations in a destination."""
+    if not destination or destination.strip() == "":
+        raise ValueError("Destination cannot be empty")
+    if not check_in or check_in.strip() == "":
+        raise ValueError("Check-in date cannot be empty")
+    if not guests:
+        raise ValueError("Guests number cannot be empty")
+
     print(
         f"search_accommodations: destination={destination}, check_in={check_in}, check_out={check_out}, guests={guests}"
     )
@@ -62,6 +69,13 @@ def search_flights(
     return_date: str | None = None,
 ) -> FlightSearch:
     """Search for available flights between destinations."""
+    if not origin or origin.strip() == "":
+        raise ValueError("Origin cannot be empty")
+    if not destination or destination.strip() == "":
+        raise ValueError("Destination cannot be empty")
+    if not departure_date or departure_date.strip() == "":
+        raise ValueError("Departure date cannot be empty")
+
     is_roundtrip = return_date is not None
     print(
         f"search_flights: origin={origin}, destination={destination}, departure_date={departure_date}, "
