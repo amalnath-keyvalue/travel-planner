@@ -58,16 +58,24 @@ class TravelPlannerGraph:
         config = self.get_config(conversation_id)
 
         if is_approved is not None:
-            result = self.graph.invoke(
-                Command(resume={"is_approved": is_approved}),
-                config=config,
-            )
+            try:
+                result = self.graph.invoke(
+                    Command(resume={"is_approved": is_approved}),
+                    config=config,
+                )
+            except Exception as e:
+                print(f"Error in approval flow: {e}")
+                return "I encountered an error while processing the approval. Please try again."
 
         else:
-            result = self.graph.invoke(
-                {"messages": [HumanMessage(content=message)]},
-                config=config,
-            )
+            try:
+                result = self.graph.invoke(
+                    {"messages": [HumanMessage(content=message)]},
+                    config=config,
+                )
+            except Exception as e:
+                print(f"Error in chat flow: {e}")
+                return "I encountered an error while processing your request. Please try again."
 
         if isinstance(result, dict) and "__interrupt__" in result:
             interrupt_data = result["__interrupt__"][0].value

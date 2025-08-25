@@ -95,11 +95,6 @@ def render_chat_interface(session_id: str, tab_data: dict):
                         {"role": "assistant", "content": response_text}
                     )
 
-    if tab_data["messages"]:
-        if st.button(f"🗑️ Clear {tab_data['title']}", key=f"clear_{session_id}"):
-            tab_data["messages"] = []
-            st.rerun()
-
 
 def main():
     st.set_page_config(
