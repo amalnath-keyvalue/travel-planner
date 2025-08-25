@@ -34,6 +34,5 @@ def create_booking_agent():
         prompt=BOOKING_AGENT_PROMPT,
         name="booking_agent",
         pre_model_hook=lambda state: debug_hook(state, "BOOKING_PRE"),
-        version="v2",
         post_model_hook=post_model_hook,
     )
