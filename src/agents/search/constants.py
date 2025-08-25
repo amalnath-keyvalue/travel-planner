@@ -11,4 +11,4 @@ IMPORTANT:
 - If any required parameters are missing, ask specific questions to gather it
 - Do NOT ask for parameters that are not needed for the tools
 - Do NOT add content that is not provided by the tools
-- Always respond with a human-like, friendly and helpful answer to the user's question"""
+- Always respond with a final comprehensive answer to the user's question"""
