@@ -1,13 +1,12 @@
 # Multi-Agent Travel Planner
 
-A simple travel planning system using LangGraph and Groq.
+A travel planning system using LangGraph and Groq with 3 specialized agents.
 
 ## Features
 
-### 🤖 Multi-Agent Architecture
-- **Supervisor Agent**: Routes requests and handles general planning
-- **Search Agent**: Handles weather and location information
-- **Booking Agent**: Manages hotel and flight bookings with approval flow
+- **Supervisor Agent**: Routes requests and presents results
+- **Search Agent**: Weather, location information, and travel planning
+- **Booking Agent**: Hotel and flight bookings with approval flow
 
 ## Setup
 
@@ -32,11 +31,7 @@ cp .env.example .env
 poetry run streamlit run streamlit_app.py
 ```
 
-The app will open at `http://localhost:8501` with:
-- Interactive chat interface
-- Example suggestions
-- Real-time agent responses
-- Natural booking approvals
+Opens at `http://localhost:8501` with chat interface and agent responses.
 
 ### 🎨 LangGraph Studio
 
@@ -53,15 +48,21 @@ The Studio interface will open at `https://smith.langchain.com/studio/?baseUrl=h
 
 > **Note**: LangStudio runs with memory disabled to avoid state conflicts during debugging.
 
-## Technical Details
+## Architecture
 
-### 🏗️ Architecture
 - **Supervisor Pattern**: Central router with specialist agents
-- **Tool-Based Delegation**: LLM-driven routing decisions
 - **Pydantic Models**: Structured data validation
-- **LangGraph Features**: Checkpointing, interrupts, state management
+- **LangGraph**: Checkpointing, interrupts, state management
+- **Memory System**: Session-based memory with embeddings
+- **Tool Integration**: Mock APIs for weather, flights, and hotels
 
-### 🔧 Agent Capabilities
-- **Supervisor**: General planning, request routing, direct responses
-- **Search**: Weather info, location details, travel data
-- **Booking**: Hotel search, flight search, booking confirmations
+## Tools & Capabilities
+
+**Search Agent Tools:**
+- Weather forecasts with temperature and rainfall data
+- Location information (timezone, currency, visa requirements)
+
+**Booking Agent Tools:**
+- Hotel search with amenities and pricing
+- Flight search with airline options and pricing
+- Booking confirmation workflows

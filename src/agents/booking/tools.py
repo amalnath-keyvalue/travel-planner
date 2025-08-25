@@ -4,6 +4,7 @@ import random
 
 from langchain_core.tools import tool
 
+from ...memory import add_memory
 from .schemas import (
     Accommodation,
     AccommodationSearch,
@@ -31,6 +32,7 @@ def search_accommodations(
     print(
         f"search_accommodations: destination={destination}, check_in={check_in}, check_out={check_out}, guests={guests}"
     )
+
     accommodations = [
         Accommodation(
             name="Beach Resort",
@@ -81,6 +83,7 @@ def search_flights(
         f"search_flights: origin={origin}, destination={destination}, departure_date={departure_date}, "
         f"return_date={return_date}"
     )
+
     flights = [
         Flight(
             airline="Demo Airways",
@@ -127,6 +130,21 @@ def confirm_accommodation_booking(
         f"check_out={check_out}, guest_name={guest_name}, payment_method={payment_method}"
     )
     booking_ref = f"HTL{random.randint(100000, 999999)}"
+
+    add_memory(
+        "demo",
+        f"Booked {accommodation_name} in {destination} for {guest_name} from {check_in} to {check_out}",
+        "booking",
+        {
+            "accommodation_name": accommodation_name,
+            "destination": destination,
+            "check_in": check_in,
+            "check_out": check_out,
+            "guest_name": guest_name,
+            "booking_reference": booking_ref,
+        },
+    )
+
     return BookingResponse(
         status="confirmed",
         booking_reference=booking_ref,
@@ -149,6 +167,20 @@ def confirm_flight_booking(
         f"passenger_name={passenger_name}, payment_method={payment_method}"
     )
     booking_ref = f"FLT{random.randint(100000, 999999)}"
+
+    add_memory(
+        "demo",
+        f"Booked flight with {airline} from {route} for {passenger_name} on {departure_date}",
+        "booking",
+        {
+            "airline": airline,
+            "route": route,
+            "departure_date": departure_date,
+            "passenger_name": passenger_name,
+            "booking_reference": booking_ref,
+        },
+    )
+
     return BookingResponse(
         status="confirmed",
         booking_reference=booking_ref,

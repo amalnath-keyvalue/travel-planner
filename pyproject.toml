@@ -14,10 +14,9 @@ langchain-core = "^0.3.74"
 langchain-groq = "^0.3.7"
 langgraph = "^0.6.6"
 langgraph-supervisor = "^0.0.29"
+langchain-huggingface = "^0.3.1"
+sentence-transformers = "^3.0.2"
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
-
-[tool.poetry.scripts]
-travel-planner = "main:main"

@@ -11,6 +11,7 @@ from langgraph_supervisor import create_supervisor
 from .agents import create_booking_agent, create_search_agent
 from .config import get_llm_model
 from .constants import SUPERVISOR_PROMPT
+from .tools import add_long_term_memory, search_long_term_memory
 from .utils import debug_hook
 
 
@@ -29,10 +30,11 @@ class TravelPlannerGraph:
                 create_search_agent(),
                 create_booking_agent(),
             ],
+            tools=[add_long_term_memory, search_long_term_memory],
             prompt=SUPERVISOR_PROMPT,
-            add_handoff_messages=True,
-            add_handoff_back_messages=True,
-            output_mode="full_history",
+            add_handoff_messages=False,
+            add_handoff_back_messages=False,
+            output_mode="last_message",
             pre_model_hook=lambda state: debug_hook(state, "SUPERVISOR_PRE"),
             post_model_hook=lambda state: debug_hook(state, "SUPERVISOR_POST"),
         )
