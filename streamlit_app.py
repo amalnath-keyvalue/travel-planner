@@ -24,10 +24,6 @@ def initialize_session_state():
         st.session_state.active_tab = "current_session"
     if "pending_interrupt" not in st.session_state:
         st.session_state.pending_interrupt = None
-    if "processing_approval" not in st.session_state:
-        st.session_state.processing_approval = False
-    if "processing_rejection" not in st.session_state:
-        st.session_state.processing_rejection = False
 
 
 def handle_example_click(text: str):
@@ -85,7 +81,6 @@ def render_chat_interface(session_id: str, tab_data: dict):
                     ):
                         st.session_state.pending_interrupt = response
                         st.session_state.active_tab = session_id
-                        st.info("⚠️ **Human approval required for this action.**")
                         st.rerun()
                     else:
                         st.write(response)
@@ -154,6 +149,58 @@ def main():
             st.session_state.active_tab,
             st.session_state.chat_tabs[st.session_state.active_tab],
         )
+
+    if st.session_state.pending_interrupt:
+        st.divider()
+        st.warning("⚠️ **Human approval required for this action.**")
+
+        col1, col2, col3 = st.columns([1, 1, 2])
+        with col1:
+            if st.button("✅ Approve", type="secondary", use_container_width=True):
+                with st.spinner("Processing approval..."):
+                    response = st.session_state.graph.chat(
+                        "",
+                        conversation_id=st.session_state.chat_tabs[
+                            st.session_state.active_tab
+                        ]["id"],
+                        is_approved=True,
+                    )
+                    st.session_state.chat_tabs[st.session_state.active_tab][
+                        "messages"
+                    ].append({"role": "assistant", "content": response})
+                    st.session_state.pending_interrupt = None
+                    st.success("✅ Action approved successfully!")
+                    st.rerun()
+
+        with col2:
+            if st.button("❌ Reject", type="secondary"):
+                with st.spinner("Processing rejection..."):
+                    response = st.session_state.graph.chat(
+                        "",
+                        conversation_id=st.session_state.chat_tabs[
+                            st.session_state.active_tab
+                        ]["id"],
+                        is_approved=False,
+                    )
+                    st.session_state.chat_tabs[st.session_state.active_tab][
+                        "messages"
+                    ].append({"role": "assistant", "content": response})
+                    st.session_state.pending_interrupt = None
+                    st.error("❌ Action rejected.")
+                    st.rerun()
+
+        with col3:
+            action_data = st.session_state.pending_interrupt.get("data", {})
+            if action_data:
+                if action_data.get("display_name"):
+                    st.write(f"**{action_data['display_name']}**")
+
+                tool_input = action_data.get("tool_input", {})
+                if tool_input:
+                    for key, value in tool_input.items():
+                        if value:
+                            readable_key = key.replace("_", " ").title()
+                            st.write(f"• **{readable_key}:** {value}")
 
     st.sidebar.header("🔗 Graph Structure")
     try:

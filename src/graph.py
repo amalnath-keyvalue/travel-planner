@@ -34,7 +34,7 @@ class TravelPlannerGraph:
             prompt=SUPERVISOR_PROMPT,
             add_handoff_messages=False,
             add_handoff_back_messages=False,
-            output_mode="full_history",
+            output_mode="last_message",
             pre_model_hook=lambda state: debug_hook(state, "SUPERVISOR_PRE"),
             post_model_hook=lambda state: debug_hook(state, "SUPERVISOR_POST"),
         )
@@ -89,8 +89,5 @@ class TravelPlannerGraph:
             message = messages[i]
             if isinstance(message, AIMessage) and message.content:
                 ai_responses.append(message.content)
-
-        if len(ai_responses) >= 2:
-            return "".join(ai_responses[-2:])
 
         return "".join(ai_responses)
