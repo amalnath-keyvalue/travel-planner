@@ -18,5 +18,4 @@ WORKFLOW:
 IMPORTANT:
 - If any required parameters are missing, ask specific questions to gather it
 - Do NOT ask for parameters that are not needed for the tools
-- Do NOT add content that is not provided by the tools
-- Always respond with the full results of the tools to answer the user's question"""
+- Do NOT add content that is not provided by the tools"""
