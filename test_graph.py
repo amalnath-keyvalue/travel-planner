@@ -3,7 +3,7 @@ from src.graph import TravelPlannerGraph
 
 def test_graph():
     """Test the travel planner graph with one query."""
-    graph = TravelPlannerGraph(enable_memory=True)
+    graph = TravelPlannerGraph()
 
     query = "What's the weather in London?"
     print(f"Query: {query}")
