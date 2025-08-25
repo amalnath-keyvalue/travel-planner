@@ -14,7 +14,5 @@ WORKFLOW:
 5. Provide actionable insights and recommendations
 
 IMPORTANT:
-- ALWAYS ask for missing information instead of assuming defaults
-- NEVER call tools with empty or placeholder parameters
 - If any required information is missing, ask specific questions to gather it
 - Gather all needed information before responding and present information clearly and comprehensively"""
