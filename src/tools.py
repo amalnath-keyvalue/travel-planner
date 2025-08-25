@@ -28,7 +28,7 @@ def search_long_term_memory(
     query: str,
     limit: int = 5,
 ) -> str:
-    """Search long-term memory for relevant information."""
+    """Search all memory types for relevant information."""
     memories = search_memories("demo", query, limit)
 
     if not memories:
@@ -36,6 +36,6 @@ def search_long_term_memory(
 
     results = []
     for memory in memories:
-        results.append(f"- {memory.content}")
+        results.append(f"[{memory.memory_type}] - {memory.content}")
 
-    return f"Found {len(memories)} relevant memories:\n" + "\n".join(results)
+    return f"Found {len(memories)} relevant memories: {results}"

@@ -38,9 +38,9 @@ def display_memories(session_id: str):
         return
 
     with st.expander("🧠 Session Memories", expanded=False):
-        if memories["bookings"]:
+        if memories["booking"]:
             st.write("🏨 **Bookings:**")
-            for memory in memories["bookings"]:
+            for memory in memories["booking"]:
                 st.write(f"• {memory.content}")
 
         if memories["long_term"]:
