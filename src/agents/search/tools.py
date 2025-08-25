@@ -12,7 +12,6 @@ def get_weather_forecast(destination: str) -> WeatherInfo:
     """Get current weather forecast for a destination (simulated API call)."""
     print(f"get_weather_forecast: destination={destination}")
 
-    # Simulate external weather API call
     conditions = ["sunny", "partly cloudy", "light rain", "overcast"]
     rainfall_levels = ["low", "medium", "high"]
 
@@ -30,7 +29,6 @@ def get_location_info(destination: str) -> LocationInfo:
     """Get basic location information (simulated API call)."""
     print(f"get_location_info: destination={destination}")
 
-    # Simulate external location/travel info API call
     return LocationInfo(
         destination=destination,
         country="Demo Country",

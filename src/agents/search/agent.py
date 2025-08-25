@@ -15,6 +15,6 @@ def create_search_agent():
         tools=[get_weather_forecast, get_location_info],
         prompt=SEARCH_AGENT_PROMPT,
         name="search_agent",
-        pre_model_hook=lambda event: debug_hook(event, "SEARCH_PRE"),
-        post_model_hook=lambda event: debug_hook(event, "SEARCH_POST"),
+        pre_model_hook=lambda state: debug_hook(state, "SEARCH_PRE"),
+        post_model_hook=lambda state: debug_hook(state, "SEARCH_POST"),
     )

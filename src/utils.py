@@ -1,29 +1,32 @@
-from typing import Any
+from langchain_core.messages import AIMessage, ToolMessage
+from langgraph.types import interrupt
 
 
 def debug_hook(
-    event: Any,
+    state: dict,
     hook_type: str = "POST",
 ) -> None:
-    print(f"\n🔍 {hook_type}_HOOK:")
-
-    if not isinstance(event, dict) or "messages" not in event:
-        print(f"   Event type: {type(event).__name__}")
+    if not isinstance(state, dict) or "messages" not in state:
+        print(f"   State type: {type(state).__name__}")
         print()
         return
 
-    messages = event["messages"]
+    print(f"\n🔍 {hook_type}_HOOK:")
+    # print(f"\n🔍 State dict: {state}")
+
+    messages = state["messages"]
     print(f"   Messages count: {len(messages)}")
 
     for i, msg in enumerate(messages):
-        msg_name = getattr(msg, "name", None)
+        msg_name: str | None = getattr(msg, "name", None)
+        msg_content: str | None = getattr(msg, "content", None)
 
-        content = msg.content.split("\n")[0] or "(no content)"
+        content = msg_content.split("\n")[0] if msg_content else "(no content)"
         content_preview = content[:100]
         if len(content) > 100:
             content_preview += "..."
 
-        tool_calls = getattr(msg, "tool_calls", None)
+        tool_calls: list[dict] | None = getattr(msg, "tool_calls", None)
         if tool_calls:
             tool_info = f" 🔧 {len(tool_calls)} tool call(s)"
         else:
@@ -54,3 +57,48 @@ def debug_hook(
                 print(f"      🔧 Tool {j+1}: {tool_name}({args_preview})")
 
     print()
+
+
+def human_in_the_loop(state, tools: list[str]) -> dict:
+    """Interrupt execution for risky booking tools requiring human approval."""
+    last = state["messages"][-1]
+
+    if isinstance(last, AIMessage) and last.tool_calls:
+        for tool_call in last.tool_calls:
+            if tool_call["name"] in tools:
+                tool_name = tool_call["name"]
+                tool_args = tool_call["args"]
+
+                display_name = tool_name.replace("_", " ").title()
+
+                if isinstance(tool_args, dict):
+                    args_display = ", ".join(
+                        [f"{k}: {v}" for k, v in tool_args.items() if v]
+                    )
+                else:
+                    args_display = str(tool_args)
+
+                decision = interrupt(
+                    {
+                        "tool_name": tool_name,
+                        "tool_input": tool_args,
+                        "display_name": display_name,
+                        "args_display": args_display,
+                        "message": f"Human approval required for {display_name}. "
+                        f"Please approve or reject this action.",
+                    }
+                )
+
+                if isinstance(decision, dict) and decision.get("is_approved"):
+                    message_content = "✅ BOOKING CONFIRMED: The user has approved this booking action."
+
+                else:
+                    message_content = "❌ BOOKING CANCELLED: The user explicitly rejected this booking action."
+
+                state["messages"].append(
+                    ToolMessage(
+                        content=message_content,
+                        tool_call_id=tool_call["id"],
+                        name=tool_call["name"],
+                    )
+                )

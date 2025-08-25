@@ -107,7 +107,7 @@ def confirm_accommodation_booking(
     guest_name: str,
     payment_method: str,
 ) -> BookingResponse:
-    """Complete a hotel booking."""
+    """Complete a hotel booking. Requires human approval for security."""
     print(
         f"confirm_accommodation_booking: accommodation_name={accommodation_name}, destination={destination}, check_in={check_in}, "
         f"check_out={check_out}, guest_name={guest_name}, payment_method={payment_method}"
@@ -129,7 +129,7 @@ def confirm_flight_booking(
     passenger_name: str,
     payment_method: str,
 ) -> BookingResponse:
-    """Complete a flight booking."""
+    """Complete a flight booking. Requires human approval for security."""
     print(
         f"confirm_flight_booking: airline={airline}, route={route}, departure_date={departure_date}, "
         f"passenger_name={passenger_name}, payment_method={payment_method}"

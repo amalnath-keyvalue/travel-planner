@@ -3,7 +3,7 @@
 from langgraph.prebuilt import create_react_agent
 
 from ...config import get_llm_model
-from ...utils import debug_hook
+from ...utils import debug_hook, human_in_the_loop
 from .constants import BOOKING_AGENT_PROMPT
 from .tools import (
     confirm_accommodation_booking,
@@ -11,6 +11,14 @@ from .tools import (
     search_accommodations,
     search_flights,
 )
+
+
+def post_model_hook(state):
+    """Post-model hook for the booking agent."""
+    debug_hook(state, "BOOKING_POST")
+    return human_in_the_loop(
+        state, ["confirm_accommodation_booking", "confirm_flight_booking"]
+    )
 
 
 def create_booking_agent():
@@ -25,6 +33,7 @@ def create_booking_agent():
         ],
         prompt=BOOKING_AGENT_PROMPT,
         name="booking_agent",
-        pre_model_hook=lambda event: debug_hook(event, "BOOKING_PRE"),
-        post_model_hook=lambda event: debug_hook(event, "BOOKING_POST"),
+        pre_model_hook=lambda state: debug_hook(state, "BOOKING_PRE"),
+        version="v2",
+        post_model_hook=post_model_hook,
     )
