@@ -17,10 +17,10 @@ from .utils import debug_hook
 class TravelPlannerGraph:
     """Multi-agent travel planner using supervisor pattern."""
 
-    def __init__(self):
-        self.graph = self._build_graph()
+    def __init__(self, enable_memory: bool = True):
+        self.graph = self._build_graph(enable_memory)
 
-    def _build_graph(self):
+    def _build_graph(self, enable_memory: bool = True):
         """Build the supervisor graph using langgraph-supervisor."""
 
         supervisor = create_supervisor(
@@ -30,16 +30,16 @@ class TravelPlannerGraph:
                 create_booking_agent(),
             ],
             prompt=SUPERVISOR_PROMPT,
-            add_handoff_messages=False,
-            add_handoff_back_messages=False,
+            add_handoff_messages=True,
+            add_handoff_back_messages=True,
             output_mode="full_history",
             pre_model_hook=lambda state: debug_hook(state, "SUPERVISOR_PRE"),
             post_model_hook=lambda state: debug_hook(state, "SUPERVISOR_POST"),
         )
 
         return supervisor.compile(
-            checkpointer=MemorySaver(),
-            store=InMemoryStore(),
+            checkpointer=MemorySaver() if enable_memory else None,
+            store=InMemoryStore() if enable_memory else None,
         )
 
     def get_config(self, conversation_id: str) -> dict[str, Any]:

@@ -1,0 +1,8 @@
+langgraph
+langgraph-supervisor
+langgraph-checkpoint
+langchain-core
+langchain-groq
+langgraph-cli[inmem]
+python-dotenv
+pydantic

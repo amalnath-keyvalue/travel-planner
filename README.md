@@ -38,6 +38,21 @@ The app will open at `http://localhost:8501` with:
 - Real-time agent responses
 - Natural booking approvals
 
+### 🎨 LangGraph Studio
+
+```bash
+# Run with LangGraph Studio for visual debugging
+langgraph dev
+```
+
+The Studio interface will open at `https://smith.langchain.com/studio/?baseUrl=http://127.0.0.1:2024` with:
+- Visual graph representation
+- Step-by-step execution debugging
+- State inspection at each node
+- Interactive graph exploration
+
+> **Note**: LangStudio runs with memory disabled to avoid state conflicts during debugging.
+
 ## Technical Details
 
 ### 🏗️ Architecture
