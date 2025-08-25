@@ -37,7 +37,7 @@ Opens at `http://localhost:8501` with chat interface and agent responses.
 
 ```bash
 # Run with LangGraph Studio for visual debugging
-langgraph dev
+poetry runlanggraph dev
 ```
 
 The Studio interface will open at `https://smith.langchain.com/studio/?baseUrl=http://127.0.0.1:2024` with:
