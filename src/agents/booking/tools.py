@@ -126,8 +126,8 @@ def confirm_accommodation_booking(
 ) -> BookingResponse:
     """Complete a hotel booking. Requires human approval for security."""
     print(
-        f"confirm_accommodation_booking: accommodation_name={accommodation_name}, destination={destination}, check_in={check_in}, "
-        f"check_out={check_out}, guest_name={guest_name}, payment_method={payment_method}"
+        f"confirm_accommodation_booking: accommodation_name={accommodation_name}, destination={destination}, "
+        f"check_in={check_in}, check_out={check_out}, guest_name={guest_name}, payment_method={payment_method}"
     )
     booking_ref = f"HTL{random.randint(100000, 999999)}"
 

@@ -34,7 +34,7 @@ class TravelPlannerGraph:
             prompt=SUPERVISOR_PROMPT,
             add_handoff_messages=False,
             add_handoff_back_messages=False,
-            output_mode="last_message",
+            output_mode="full_history",
             pre_model_hook=lambda state: debug_hook(state, "SUPERVISOR_PRE"),
             post_model_hook=lambda state: debug_hook(state, "SUPERVISOR_POST"),
         )
@@ -85,17 +85,4 @@ class TravelPlannerGraph:
                 "message": "Human approval required. Please respond to continue.",
             }
 
-        messages = result["messages"]
-
-        last_human_index = -1
-        for i, msg in enumerate(messages):
-            if isinstance(msg, HumanMessage):
-                last_human_index = i
-
-        ai_responses = []
-        for i in range(last_human_index + 1, len(messages)):
-            message = messages[i]
-            if isinstance(message, AIMessage) and message.content:
-                ai_responses.append(message.content)
-
-        return "".join(ai_responses)
+        return result["messages"][-1].content
