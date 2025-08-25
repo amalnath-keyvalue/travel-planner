@@ -1,0 +1,8 @@
+{
+  "python_path": ".",
+  "dependencies": ["."],
+  "graphs": {
+    "travel_agent": "./src/studio_util.py:travel_agent_graph"
+  },
+  "env": ".env"
+}

@@ -22,6 +22,7 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+.langgraph_api/
 
 # pyenv
 .python-version
