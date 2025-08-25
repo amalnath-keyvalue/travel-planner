@@ -11,6 +11,7 @@ from langgraph_supervisor import create_supervisor
 from .agents import create_booking_agent, create_search_agent
 from .config import get_llm_model
 from .constants import SUPERVISOR_PROMPT
+from .tools import add_long_term_memory, search_long_term_memory
 from .utils import debug_hook
 
 
@@ -29,6 +30,7 @@ class TravelPlannerGraph:
                 create_search_agent(),
                 create_booking_agent(),
             ],
+            tools=[add_long_term_memory, search_long_term_memory],
             prompt=SUPERVISOR_PROMPT,
             add_handoff_messages=False,
             add_handoff_back_messages=False,
@@ -87,5 +89,8 @@ class TravelPlannerGraph:
             message = messages[i]
             if isinstance(message, AIMessage) and message.content:
                 ai_responses.append(message.content)
+
+        if len(ai_responses) >= 2:
+            return "".join(ai_responses[-2:])
 
         return "".join(ai_responses)

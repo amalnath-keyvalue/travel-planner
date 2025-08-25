@@ -5,6 +5,7 @@ import time
 import streamlit as st
 
 from src import TravelPlannerGraph
+from src.memory import get_session_memories
 
 
 def initialize_session_state():
@@ -32,6 +33,27 @@ def initialize_session_state():
 def handle_example_click(text: str):
     """Handle example button click."""
     st.session_state[f"chat_input_{st.session_state.active_tab}"] = text
+
+
+def display_memories(session_id: str):
+    memories = get_session_memories(session_id)
+
+    if not any(memories.values()):
+        return
+
+    with st.expander("🧠 Session Memories", expanded=False):
+        if memories["bookings"]:
+            st.write("🏨 **Bookings:**")
+            for memory in memories["bookings"]:
+                st.write(f"• {memory.content}")
+
+        if memories["long_term"]:
+            st.write("💾 **Long-term Memories:**")
+            for memory in memories["long_term"]:
+                importance = memory.metadata.get("importance", "medium")
+                tags = memory.metadata.get("tags", [])
+                tag_str = f" [{', '.join(tags)}]" if tags else ""
+                st.write(f"• {memory.content}{tag_str} ({importance})")
 
 
 def render_chat_interface(session_id: str, tab_data: dict):
@@ -78,6 +100,11 @@ def render_chat_interface(session_id: str, tab_data: dict):
                         {"role": "assistant", "content": response_text}
                     )
 
+    if tab_data["messages"]:
+        if st.button(f"🗑️ Clear {tab_data['title']}", key=f"clear_{session_id}"):
+            tab_data["messages"] = []
+            st.rerun()
+
 
 def main():
     st.set_page_config(
@@ -116,11 +143,13 @@ def main():
         for i, (tab_id, tab_data) in enumerate(st.session_state.chat_tabs.items()):
             with selected_tab[i]:
                 st.subheader(f"💬 {tab_data['title']}")
+                display_memories(tab_data["id"])
                 render_chat_interface(tab_id, tab_data)
     else:
         st.subheader(
             f"💬 {st.session_state.chat_tabs[st.session_state.active_tab]['title']}"
         )
+        display_memories(st.session_state.active_tab)
         render_chat_interface(
             st.session_state.active_tab,
             st.session_state.chat_tabs[st.session_state.active_tab],
