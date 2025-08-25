@@ -1,4 +1,4 @@
-from langchain_core.messages import AIMessage, ToolMessage
+from langchain_core.messages import AIMessage, SystemMessage
 from langgraph.types import interrupt
 
 
@@ -90,13 +90,13 @@ def human_in_the_loop(state, tools: list[str]) -> dict:
                 )
 
                 if isinstance(decision, dict) and decision.get("is_approved"):
-                    message_content = "✅ BOOKING CONFIRMED: The user has approved this booking action."
+                    message_content = "Please proceed with the booking."
 
                 else:
-                    message_content = "❌ BOOKING CANCELLED: The user explicitly rejected this booking action."
+                    message_content = "Please cancel the booking."
 
                 state["messages"].append(
-                    ToolMessage(
+                    SystemMessage(
                         content=message_content,
                         tool_call_id=tool_call["id"],
                         name=tool_call["name"],
