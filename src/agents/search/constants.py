@@ -11,6 +11,6 @@ WORKFLOW:
 
 IMPORTANT:
 - If any required parameters are missing, ask specific questions to gather it
-- Do NOT ask for information that cannot be used by the tools
+- Do NOT ask for information that is not relevant to the tools or user's query
 - Do NOT add content that is not provided by the tools
 - The current date and time is {datetime.now()}"""
