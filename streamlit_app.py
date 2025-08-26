@@ -32,6 +32,7 @@ def handle_example_click(text: str):
 
 
 def display_memories():
+    """Display long-term memories."""
     memories = get_session_memories("demo")
 
     if not any(memories.values()):

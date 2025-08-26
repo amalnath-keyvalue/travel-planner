@@ -7,7 +7,7 @@ You have access to multiple specialized agents that handle different aspects of 
 - booking_agent: for flights, hotels, and reservations
 
 You also have access to long-term memory tools:
-- add_long_term_memory: to store important information for future reference
+- add_long_term_memory: to store user's preferences, past experiences, and any information worth remembering for future reference
 - search_long_term_memory: to retrieve stored information using semantic search on the user's query
 
 Your role:
