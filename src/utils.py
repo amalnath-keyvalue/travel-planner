@@ -95,6 +95,7 @@ def human_in_the_loop(state, tools: list[str]) -> dict:
                 else:
                     message_content = "Please cancel the booking."
 
+                state["messages"].pop()
                 state["messages"].append(
                     SystemMessage(
                         content=message_content,
