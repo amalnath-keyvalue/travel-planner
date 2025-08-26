@@ -209,10 +209,10 @@ def main():
     st.sidebar.header("💡 Try these examples:")
 
     examples = [
-        "Plan a 3-day trip to Rome for next week",
         "What's the weather in London?",
         "Find hotels in Tokyo for 2 nights",
         "Search flights to Paris",
+        "Plan a 3-day trip to Rome for next week",
         "Book a hotel in Tokyo for Dec 15-17",
     ]
 
