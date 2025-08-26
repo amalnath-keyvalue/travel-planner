@@ -12,7 +12,8 @@ A travel planning system using LangGraph and Groq with 3 specialized agents.
 
 ```bash
 # Install Poetry if not installed
-curl -sSL https://install.python-poetry.org | python3 -
+sudo apt install pipx
+pipx install poetry
 
 # Install dependencies
 poetry install
