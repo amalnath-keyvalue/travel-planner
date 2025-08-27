@@ -12,7 +12,7 @@ def debug_hook(
         return
 
     print(f"\n🔍 {hook_type}_HOOK:")
-    print(f"\n🔍 State dict: {state}")
+    # print(f"\n🔍 State dict: {state}")
 
     messages = state["messages"]
     print(f"   Messages count: {len(messages)}")
@@ -96,5 +96,3 @@ def human_in_the_loop(state, tools: list[str]) -> dict:
                         name=tool_call["name"],
                     )
                     state["messages"].append(tool_msg)
-
-    return state
