@@ -9,7 +9,19 @@ def add_long_term_memory(
     importance: str = "medium",
     tags: str = "",
 ) -> str:
-    """Add information to long-term memory for future reference."""
+    """Add information to long-term memory for future reference.
+
+    Args:
+        content: The information to be stored in memory
+        importance: Priority level of the memory (low, medium, high)
+        tags: Comma-separated tags for categorizing the memory
+
+    Returns:
+        Confirmation message indicating the content was added to memory
+
+    Example:
+        add_long_term_memory("User prefers beach destinations", "high", "preferences,beach")
+    """
     add_memory(
         "demo",
         content,
@@ -28,7 +40,18 @@ def search_long_term_memory(
     query: str,
     limit: int = 5,
 ) -> str:
-    """Search all memory types for relevant information."""
+    """Search all memory types for relevant information based on a query.
+
+    Args:
+        query: Search term to find relevant memories
+        limit: Maximum number of memories to return (default: 5)
+
+    Returns:
+        Formatted string containing found memories or "No relevant memories found"
+
+    Example:
+        search_long_term_memory("beach destinations", 3)
+    """
     memories = search_memories("demo", query, limit)
 
     if not memories:

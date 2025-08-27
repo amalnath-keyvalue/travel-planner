@@ -21,7 +21,23 @@ def search_accommodations(
     guests: int,
     check_out: str | None = None,
 ) -> AccommodationSearch:
-    """Search for available accommodations in a destination."""
+    """Search for available accommodations in a destination.
+
+    Args:
+        destination: The destination city or location to search for accommodations
+        check_in: Check-in date in string format (e.g., "2024-01-15")
+        guests: Number of guests for the accommodation
+        check_out: Check-out date in string format, optional for same-day stays
+
+    Returns:
+        AccommodationSearch object containing destination details and available accommodation options
+
+    Raises:
+        ValueError: If destination, check_in, or guests are empty/invalid
+
+    Example:
+        search_accommodations("Bali", "2024-02-01", 2, "2024-02-05")
+    """
     if not destination or destination.strip() == "":
         raise ValueError("Destination cannot be empty")
     if not check_in or check_in.strip() == "":
@@ -70,7 +86,23 @@ def search_flights(
     departure_date: str,
     return_date: str | None = None,
 ) -> FlightSearch:
-    """Search for available flights between destinations."""
+    """Search for available flights between destinations.
+
+    Args:
+        origin: Departure city or airport code
+        destination: Arrival city or airport code
+        departure_date: Departure date in string format (e.g., "2024-01-15")
+        return_date: Return date for round-trip flights, optional for one-way trips
+
+    Returns:
+        FlightSearch object containing route details, dates, and available flight options
+
+    Raises:
+        ValueError: If origin, destination, or departure_date are empty/invalid
+
+    Example:
+        search_flights("NYC", "LAX", "2024-02-01", "2024-02-08")
+    """
     if not origin or origin.strip() == "":
         raise ValueError("Origin cannot be empty")
     if not destination or destination.strip() == "":
@@ -124,7 +156,26 @@ def confirm_accommodation_booking(
     guest_name: str,
     payment_method: str,
 ) -> BookingResponse:
-    """Complete a hotel booking. Requires human approval for security."""
+    """Complete a hotel accommodation booking and store it in memory.
+
+    Args:
+        accommodation_name: Name of the hotel or accommodation property
+        destination: The destination city or location
+        check_in: Check-in date in string format
+        check_out: Check-out date in string format
+        guest_name: Full name of the guest making the booking
+        payment_method: Payment method used for the booking
+
+    Returns:
+        BookingResponse object containing confirmation status, booking reference, and details
+
+    Example:
+        confirm_accommodation_booking("Beach Resort", "Bali", "2024-02-01", "2024-02-05", "John Doe", "Credit Card")
+
+    Note:
+        This tool generates a random booking reference and stores the booking in memory.
+        In production, this would integrate with actual booking systems and require human approval.
+    """
     print(
         f"confirm_accommodation_booking: accommodation_name={accommodation_name}, destination={destination}, "
         f"check_in={check_in}, check_out={check_out}, guest_name={guest_name}, payment_method={payment_method}"
@@ -161,7 +212,25 @@ def confirm_flight_booking(
     passenger_name: str,
     payment_method: str,
 ) -> BookingResponse:
-    """Complete a flight booking. Requires human approval for security."""
+    """Complete a flight booking and store it in memory.
+
+    Args:
+        airline: Name of the airline for the flight
+        route: Flight route in format "Origin → Destination"
+        departure_date: Departure date in string format
+        passenger_name: Full name of the passenger
+        payment_method: Payment method used for the booking
+
+    Returns:
+        BookingResponse object containing confirmation status, booking reference, and details
+
+    Example:
+        confirm_flight_booking("Demo Airways", "NYC → LAX", "2024-02-01", "Jane Smith", "Credit Card")
+
+    Note:
+        This tool generates a random booking reference and stores the booking in memory.
+        In production, this would integrate with actual airline booking systems and require human approval.
+    """
     print(
         f"confirm_flight_booking: airline={airline}, route={route}, departure_date={departure_date}, "
         f"passenger_name={passenger_name}, payment_method={payment_method}"

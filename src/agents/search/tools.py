@@ -9,7 +9,20 @@ from .schemas import LocationInfo, WeatherInfo
 
 @tool
 def get_weather_forecast(destination: str) -> WeatherInfo:
-    """Get current weather forecast for a destination (simulated API call)."""
+    """Get current weather forecast for a destination.
+
+    Args:
+        destination: The destination city or location to get weather for
+
+    Returns:
+        WeatherInfo object containing temperature range, conditions, rainfall level, and best time to visit
+
+    Raises:
+        ValueError: If destination is empty or whitespace
+
+    Example:
+        get_weather_forecast("Paris")
+    """
     if not destination or destination.strip() == "":
         raise ValueError("Destination cannot be empty")
 
@@ -29,7 +42,20 @@ def get_weather_forecast(destination: str) -> WeatherInfo:
 
 @tool
 def get_location_info(destination: str) -> LocationInfo:
-    """Get basic location information (simulated API call)."""
+    """Get basic location information for a destination.
+
+    Args:
+        destination: The destination city or location to get information for
+
+    Returns:
+        LocationInfo object containing country, timezone, currency, language, and visa requirements
+
+    Raises:
+        ValueError: If destination is empty or whitespace
+
+    Example:
+        get_location_info("Tokyo")
+    """
     if not destination or destination.strip() == "":
         raise ValueError("Destination cannot be empty")
 
