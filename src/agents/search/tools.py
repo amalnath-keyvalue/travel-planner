@@ -36,7 +36,6 @@ def get_weather_forecast(destination: str) -> WeatherInfo:
         temperature_range=f"{random.randint(15, 25)}-{random.randint(26, 35)}°C",
         condition=random.choice(conditions),
         rainfall_level=random.choice(rainfall_levels),
-        best_time_to_visit="Agent will provide specific recommendations based on destination analysis",
     )
 
 

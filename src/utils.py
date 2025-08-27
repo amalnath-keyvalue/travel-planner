@@ -1,4 +1,4 @@
-from langchain_core.messages import AIMessage, SystemMessage
+from langchain_core.messages import AIMessage, ToolMessage
 from langgraph.types import interrupt
 
 
@@ -12,7 +12,7 @@ def debug_hook(
         return
 
     print(f"\n🔍 {hook_type}_HOOK:")
-    # print(f"\n🔍 State dict: {state}")
+    print(f"\n🔍 State dict: {state}")
 
     messages = state["messages"]
     print(f"   Messages count: {len(messages)}")
@@ -89,16 +89,12 @@ def human_in_the_loop(state, tools: list[str]) -> dict:
                     }
                 )
 
-                if isinstance(decision, dict) and decision.get("is_approved"):
-                    message_content = "Please proceed with the booking."
-
-                else:
-                    message_content = "Please cancel the booking."
-
-                state["messages"].append(
-                    SystemMessage(
-                        content=message_content,
+                if isinstance(decision, dict) and not decision.get("is_approved"):
+                    tool_msg = ToolMessage(
+                        content="Cancelled by user. Continue without executing that tool and provide next steps.",
                         tool_call_id=tool_call["id"],
                         name=tool_call["name"],
                     )
-                )
+                    state["messages"].append(tool_msg)
+
+    return state

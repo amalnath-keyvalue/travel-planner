@@ -4,7 +4,6 @@ from typing import Any
 
 from langchain_core.messages import HumanMessage
 from langgraph.checkpoint.memory import MemorySaver
-from langgraph.store.memory import InMemoryStore
 from langgraph.types import Command
 from langgraph_supervisor import create_supervisor
 
@@ -32,8 +31,8 @@ class TravelPlannerGraph:
             ],
             tools=[add_long_term_memory, search_long_term_memory],
             prompt=SUPERVISOR_PROMPT,
-            add_handoff_messages=False,
-            add_handoff_back_messages=False,
+            add_handoff_messages=True,
+            add_handoff_back_messages=True,
             output_mode="full_history",
             pre_model_hook=lambda state: debug_hook(state, "SUPERVISOR_PRE"),
             post_model_hook=lambda state: debug_hook(state, "SUPERVISOR_POST"),
@@ -41,7 +40,6 @@ class TravelPlannerGraph:
 
         return supervisor.compile(
             checkpointer=MemorySaver() if enable_memory else None,
-            store=InMemoryStore() if enable_memory else None,
         )
 
     def get_config(self, conversation_id: str) -> dict[str, Any]:
