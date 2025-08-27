@@ -23,10 +23,10 @@ def get_weather_forecast(destination: str) -> WeatherInfo:
     Example:
         get_weather_forecast("Paris")
     """
+    print(f"Called get_weather_forecast: destination={destination}")
+
     if not destination or destination.strip() == "":
         raise ValueError("Destination cannot be empty")
-
-    print(f"get_weather_forecast: destination={destination}")
 
     conditions = ["sunny", "partly cloudy", "light rain", "overcast"]
     rainfall_levels = ["low", "medium", "high"]
@@ -55,10 +55,10 @@ def get_location_info(destination: str) -> LocationInfo:
     Example:
         get_location_info("Tokyo")
     """
+    print(f"Called get_location_info: destination={destination}")
+
     if not destination or destination.strip() == "":
         raise ValueError("Destination cannot be empty")
-
-    print(f"get_location_info: destination={destination}")
 
     return LocationInfo(
         destination=destination,

@@ -22,6 +22,10 @@ def add_long_term_memory(
     Example:
         add_long_term_memory("User prefers beach destinations", "high", "preferences,beach")
     """
+    print(
+        f"Called add_long_term_memory: content={content}, importance={importance}, tags={tags}"
+    )
+
     add_memory(
         "demo",
         content,
@@ -52,6 +56,8 @@ def search_long_term_memory(
     Example:
         search_long_term_memory("beach destinations", 3)
     """
+    print(f"Called search_long_term_memory: query={query}, limit={limit}")
+
     memories = search_memories("demo", query, limit)
 
     if not memories:

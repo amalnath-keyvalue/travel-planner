@@ -38,16 +38,16 @@ def search_accommodations(
     Example:
         search_accommodations("Bali", "2024-02-01", 2, "2024-02-05")
     """
+    print(
+        f"Called search_accommodations: destination={destination}, check_in={check_in}, check_out={check_out}, guests={guests}"
+    )
+
     if not destination or destination.strip() == "":
         raise ValueError("Destination cannot be empty")
     if not check_in or check_in.strip() == "":
         raise ValueError("Check-in date cannot be empty")
     if not guests:
         raise ValueError("Guests number cannot be empty")
-
-    print(
-        f"search_accommodations: destination={destination}, check_in={check_in}, check_out={check_out}, guests={guests}"
-    )
 
     accommodations = [
         Accommodation(
@@ -103,6 +103,11 @@ def search_flights(
     Example:
         search_flights("NYC", "LAX", "2024-02-01", "2024-02-08")
     """
+    print(
+        f"Called search_flights: origin={origin}, destination={destination}, departure_date={departure_date}, "
+        f"return_date={return_date}"
+    )
+
     if not origin or origin.strip() == "":
         raise ValueError("Origin cannot be empty")
     if not destination or destination.strip() == "":
@@ -111,10 +116,6 @@ def search_flights(
         raise ValueError("Departure date cannot be empty")
 
     is_roundtrip = return_date is not None
-    print(
-        f"search_flights: origin={origin}, destination={destination}, departure_date={departure_date}, "
-        f"return_date={return_date}"
-    )
 
     flights = [
         Flight(
@@ -177,9 +178,10 @@ def confirm_accommodation_booking(
         In production, this would integrate with actual booking systems and require human approval.
     """
     print(
-        f"confirm_accommodation_booking: accommodation_name={accommodation_name}, destination={destination}, "
+        f"Called confirm_accommodation_booking: accommodation_name={accommodation_name}, destination={destination}, "
         f"check_in={check_in}, check_out={check_out}, guest_name={guest_name}, payment_method={payment_method}"
     )
+
     booking_ref = f"HTL{random.randint(100000, 999999)}"
 
     add_memory(
@@ -232,9 +234,10 @@ def confirm_flight_booking(
         In production, this would integrate with actual airline booking systems and require human approval.
     """
     print(
-        f"confirm_flight_booking: airline={airline}, route={route}, departure_date={departure_date}, "
+        f"Called confirm_flight_booking: airline={airline}, route={route}, departure_date={departure_date}, "
         f"passenger_name={passenger_name}, payment_method={payment_method}"
     )
+
     booking_ref = f"FLT{random.randint(100000, 999999)}"
 
     add_memory(
