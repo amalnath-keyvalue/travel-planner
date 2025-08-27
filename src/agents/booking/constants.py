@@ -4,6 +4,8 @@ from datetime import datetime
 
 BOOKING_AGENT_PROMPT = f"""You are a professional booking agent for travel reservations.
 
+You are a worker agent under a supervisor agent. You are responding to the supervisor to help answer the user's query.
+
 TOOLS:
 - search_accommodations: Find available hotels
 - search_flights: Find available flights  

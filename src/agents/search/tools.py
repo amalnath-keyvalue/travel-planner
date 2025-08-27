@@ -15,7 +15,7 @@ def get_weather_forecast(destination: str) -> WeatherInfo:
         destination: The destination city or location to get weather for
 
     Returns:
-        WeatherInfo object containing temperature range, conditions, rainfall level, and best time to visit
+        WeatherInfo object containing temperature range, conditions, and rainfall level
 
     Raises:
         ValueError: If destination is empty or whitespace
